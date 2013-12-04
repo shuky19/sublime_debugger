@@ -1,0 +1,106 @@
+[
+	{
+		"id": "tools",
+		"children":
+		[
+			{
+				"id":"end"
+			},
+			{
+				"caption": "Debugger",
+				"children":
+				[
+					{
+						"caption": "Debugger: Start debugging",
+						"command": "debug",
+						"args": {"command":"start_debug"}
+					},
+					{
+						"caption": "Debugger: Start debugging (Current file)",
+						"command": "debug",
+						"args": {"command":"start_debug_current_file"}
+					},
+					{
+						"caption": "Debugger: Stop debugging",
+						"command": "debug",
+						"args": {"command":"stop_debug"}
+					},
+					{
+						"caption": "-"
+					},
+					{
+						"caption": "Toggle breakpoint",
+						"command": "toggle_breakpoint",
+						"args": {"mode": "normal"}
+					},
+					{
+						"caption": "Toggle conditional breakpoint",
+						"command": "toggle_breakpoint",
+						"args": {"mode": "conditional"}
+					},
+					{
+						"caption": "Clear all breakpoints",
+						"command": "toggle_breakpoint",
+						"args": {"mode": "clear_all"}
+					},
+					{
+						"caption": "-"
+					},
+					{
+						"caption": "Debugger: Send input",
+						"command": "debug",
+						"args": {"command":"send_input"}
+					},
+					{
+						"caption": "Debugger: Add watch expression",
+						"command": "debug",
+						"args": {"command":"add_watch"}
+					},
+					{
+						"caption": "Debugger: Run expression",
+						"command": "debug",
+						"args": {"command":"get_expression"}
+					},
+					{
+						"caption": "-"
+					},
+					{
+						"caption": "Debugger: Step over",
+						"command": "debug",
+						"args": {"command":"step_over"}
+					},
+					{
+						"caption": "Debugger: Step into",
+						"command": "debug",
+						"args": {"command":"step_into"}
+					},
+					{
+						"caption": "Debugger: Step up",
+						"command": "debug",
+						"args": {"command":"step_up"}
+					},
+					{
+						"caption": "Debugger: Step down",
+						"command": "debug",
+						"args": {"command":"step_down"}
+					},
+					{
+						"caption": "Debugger: Continue",
+						"command": "debug",
+						"args": {"command":"continute"}
+					},
+					{
+						"caption": "Debugger: Run until cursor",
+						"command": "debug",
+						"args": {"command":"go_to"}
+					},
+					{
+						"caption": "Debugger: Jump to cursor",
+						"command": "debug",
+						"args": {"command":"jump"}
+					},
+				]
+			}
+		]
+	}
+]

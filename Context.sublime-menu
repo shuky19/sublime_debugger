@@ -1,0 +1,36 @@
+[
+	{
+		"caption": "Debugger",
+		"children":
+		[
+			{
+				"caption": "Toggle breakpoint",
+				"command": "toggle_breakpoint",
+				"args": {"mode": "normal"}
+			},
+			{
+				"caption": "Toggle conditional breakpoint",
+				"command": "toggle_breakpoint",
+				"args": {"mode": "conditional"}
+			},
+			{
+				"caption": "Clear all breakpoints",
+				"command": "toggle_breakpoint",
+				"args": {"mode": "clear_all"}
+			},
+			{
+				"caption": "-"
+			},
+			{
+				"caption": "Run until cursor",
+				"command": "debug",
+				"args": {"command":"go_to"}
+			},
+			{
+				"caption": "Jump to cursor",
+				"command": "debug",
+				"args": {"command":"jump"}
+			},
+		]
+	}
+]
