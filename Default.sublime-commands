@@ -5,9 +5,19 @@
 		"args": {"command":"start_debug"}
 	},
 	{
+		"caption": "Debugger: Start debugging rails",
+		"command": "debug",
+		"args": {"command":"start_debug_current_file"}
+	},
+	{
 		"caption": "Debugger: Start debugging (Current file)",
 		"command": "debug",
 		"args": {"command":"start_debug_current_file"}
+	},
+	{
+		"caption": "Debugger: Pause",
+		"command": "debug",
+		"args": {"command":"interrupt"}
 	},
 	{
 		"caption": "Debugger: Stop debugging",
@@ -16,7 +26,7 @@
 	},
 	{
 		"caption": "Debugger: Toggle breakpoint",
-		"command": "toggle_breakpoint"
+		"command": "toggle_breakpoint",
 		"args": {"mode": "normal"}
 	},
 	{
@@ -78,5 +88,5 @@
 		"caption": "Debugger: Run expression",
 		"command": "debug",
 		"args": {"command":"get_expression"}
-	},
+	}
 ]

@@ -1,10 +1,13 @@
+import time
 import traceback
 import socket
 import re
 import subprocess
 from io import StringIO
 from threading import Thread
+import queue
 from queue import Queue
+from RubyDebugger.helpers.path_helper import PathHelper
 from RubyDebugger.models.debugger_model import DebuggerModel
 from RubyDebugger.connectors.debugger_connector import DebuggerConnector
 
@@ -15,6 +18,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.debugger = debugger
 		self.process = None
 		self.client = None
+		self.control_client = None
 		self.connected = False
 
 	def start(self, current_directory, file_name, *args):
@@ -23,7 +27,10 @@ class RubyDebuggerConnector(DebuggerConnector):
 		'''
 		# Create new process
 		self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.process = subprocess.Popen("ruby -C"+current_directory+" -rc:\\ruby_debugger\\sub_debug.rb "+file_name+" "+" ".join(args), stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
+		self.control_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
+		process_params += args
+		self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
 		self.data = StringIO()
 
 		self.requests = Queue()
@@ -34,29 +41,36 @@ class RubyDebuggerConnector(DebuggerConnector):
 		for i in range(1,5):
 			try:
 				self.client.connect(("localhost", 8989))
+				self.control_client.connect(("localhost", 8990))
 				self.connected = True
-				self.log_message("Connected\n")
+				self.log_message("Connected"+"\n")
+
+				# Start reader thread
+				self.reader = Thread(target=self.reader_thread)
+				self.reader.daemon = True
+				self.reader.start()
 				break
 			except Exception as ex:
 				if i == 4:
 					self.log_message("Connection could not be made: "+str(ex)+"\n")
-					return
-
-		# Start reader thread
-		self.reader = Thread(target=self.reader_thread)
-		self.reader.daemon = True
-		self.reader.start()
+				else:
+					time.sleep(1)
 
 		# Start output thread
-		self.outputer = Thread(target=self.output_thread)
+		self.outputer = Thread(target=lambda stream = self.process.stderr: self.output_thread(stream))
 		self.outputer.daemon = True
 		self.outputer.start()
-	
-	def output_thread(self):
+
+		# Start errors thread
+		self.outputer = Thread(target=lambda stream = self.process.stdout: self.output_thread(stream))
+		self.outputer.daemon = True
+		self.outputer.start()
+
+	def output_thread(self, stream):
 		# Always read stream`
 		try:
 			while True:
-				bytes = self.process.stdout.readline()
+				bytes = stream.readline()
 
 				if len(bytes) == 0:
 					break
@@ -83,8 +97,10 @@ class RubyDebuggerConnector(DebuggerConnector):
 					self.handle_response()
 
 		except Exception as ex:
-			self.log_message("Debugger exception: "+str(ex)+"\n StackTrace: "+traceback.format_exc())
-			
+			if self.connected:
+				self.log_message("Debugger exception: "+str(ex)+"\n StackTrace: "+traceback.format_exc())
+				self.connected = False
+
 		self.outputer.join()
 
 		# Signal that the process has exited
@@ -98,31 +114,34 @@ class RubyDebuggerConnector(DebuggerConnector):
 		for result in results:
 			if result:
 				pass
-				
+
 			file_name, line_number = self.get_current_position()
 
 			# Check wheather position was updated
 			if file_name != "" and "sub_debug.rb" not in file_name:
 				self.debugger.signal_position_changed(file_name, line_number)
 
-			request = self.requests.get()
-			# self.log_message("Pop request: "+str(request)+", current queue size: "+str(self.requests.qsize())+", request result:"+result)
+			try:
+				request = self.requests.get_nowait()
+				# self.log_message("Pop request: "+str(request)+", current queue size: "+str(self.requests.qsize())+", request result:"+result)
 
-			# Check if should return the result
-			if request["signal"]:
-				prefix = request.get("prefix")
-				data = result.strip()
+				# Check if should return the result
+				if request["signal"]:
+					prefix = request.get("prefix")
+					data = result.strip()
 
-				if prefix:
-					data = (prefix, data)
+					if prefix:
+						data = (prefix, data)
 
-				# Return result
-				self.debugger.signal_text_result(data, request["reason"])
-			else:
+					# Return result
+					self.debugger.signal_text_result(data, request["reason"])
+				else:
+					pass
+
+				if "sub_debug.rb" in file_name:
+					self.debugger.run_command(DebuggerModel.COMMAND_CONTINUTE)
+			except queue.Empty:
 				pass
-
-			if "sub_debug.rb" in file_name:
-				self.debugger.run_command(DebuggerModel.COMMAND_CONTINUTE)
 
 		self.data = StringIO()
 		self.data.write(next_result)
@@ -138,10 +157,19 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.process.stdin.write(bytes(command+"\n","UTF-8"))
 		self.process.stdin.flush()
 
+	def send_control_command(self, command):
+		if not self.connected:
+			return
+
+		try:
+			self.control_client.sendall(bytes(command+"\n", 'UTF-8'))
+		except Exception as e:
+			self.log_message("Failed communicate with process ("+command+"): "+str(e))
+
 	def send_data_internal(self, command):
 		if not self.connected:
 			return
-		
+
 		try:
 			self.client.sendall(bytes(command+"\n", 'UTF-8'))
 		except Exception as e:
@@ -197,6 +225,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 		return self.data.getvalue().split('\n')
 
 	def stop(self):
-		self.process.kill()
-		self.process = None
 		self.connected = False
+		self.send_control_command("kill")
+		if self.process:
+			self.process.kill()
+		self.process = None

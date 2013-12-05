@@ -1,7 +1,7 @@
 [
 	{ "keys": ["f6"], "command": "debug", "args": {"command":"start_debug"} },
 	{ "keys": ["shift+f6"], "command": "debug", "args": {"command":"start_debug_current_file"} },
-	{ "keys": ["alt+f6"], "command": "debug", "args": {"command":"start_rails"} },
+	{ "keys": ["alt+shift+r"], "command": "debug", "args": {"command":"start_rails"} },
 	{ "keys": ["f7"], "command": "debug", "args": {"command":"get_expression"} },
 	{ "keys": ["f8"], "command": "debug", "args": {"command":"continute"} },
 	{ "keys": ["f9"], "command": "toggle_breakpoint", "args": {"mode": "normal"} },
@@ -12,12 +12,12 @@
 	{ "keys": ["ctrl+shift+f10"], "command": "debug", "args": {"command":"jump"} },
 	{ "keys": ["f11"], "command": "debug", "args": {"command":"step_into"} },
 	{ "keys": ["ctrl+alt+break"], "command": "debug", "args": {"command":"interrupt"} },
-	{ "keys": ["alt+d", "alt+t"], "command": "debug", "args": {"command":"get_threads"} },
-	{ "keys": ["alt+d", "alt+l"], "command": "debug", "args": {"command":"get_locals"} },
-	{ "keys": ["alt+d", "alt+s"], "command": "debug", "args": {"command":"get_stacktrace"} },
-	{ "keys": ["alt+d", "alt+u"], "command": "debug", "args": {"command":"step_up"} },
-	{ "keys": ["alt+d", "alt+d"], "command": "debug", "args": {"command":"step_down"} },
-	{ "keys": ["alt+d", "alt+k"], "command": "debug", "args": {"command":"stop_debug"} },
-	{ "keys": ["alt+d", "alt+i"], "command": "debug", "args": {"command":"send_input"} },
-	{ "keys": ["alt+d", "alt+w"], "command": "debug", "args": {"command":"add_watch"} }
+	{ "keys": ["alt+d", "l"], "command": "debug", "args": {"command":"get_locals"} },
+	{ "keys": ["alt+d", "t"], "command": "debug", "args": {"command":"get_threads"} },
+	{ "keys": ["alt+d", "s"], "command": "debug", "args": {"command":"get_stacktrace"} },
+	{ "keys": ["alt+d", "u"], "command": "debug", "args": {"command":"step_up"} },
+	{ "keys": ["alt+d", "d"], "command": "debug", "args": {"command":"step_down"} },
+	{ "keys": ["alt+d", "k"], "command": "debug", "args": {"command":"stop_debug"} },
+	{ "keys": ["alt+d", "i"], "command": "debug", "args": {"command":"send_input"} },
+	{ "keys": ["alt+d", "w"], "command": "debug", "args": {"command":"add_watch"} }
 ]

@@ -1,6 +1,6 @@
 class DebuggerModel(object):
 	"""Represent data model for debugger"""
-	
+
 	# Debugging data types
 	DATA_WATCH = "Watch"
 	DATA_IMMIDIATE = "Immidiate"
@@ -13,8 +13,9 @@ class DebuggerModel(object):
 	# Debugging controlling
 	COMMAND_START = "start_debug"
 	COMMAND_START_CURRENT_FILE = "start_debug_current_file"
-	COMMAND_START_RAILS = "start_debug_rails"
+	COMMAND_START_RAILS = "start_rails"
 	COMMAND_STOP = "stop_debug"
+	COMMAND_INTERRUPT = "interrupt"
 
 	# Debuggin cursor movement
 	COMMAND_STEP_OVER = "step_over"
@@ -36,7 +37,7 @@ class DebuggerModel(object):
 	COMMAND_SEND_INPUT = "send_input"
 	COMMAND_SET_BREAKPOINT = "set_breakpoint"
 	COMMAND_CLEAR_BREAKPOINTS = "clear_breakpoints"
-	
+
 	COMMAND_ADD_WATCH = "add_watch"
 	COMMAND_GET_WATCH = "get_watch"
 
@@ -46,7 +47,7 @@ class DebuggerModel(object):
 
 	APPENDABLE_DATA = [DATA_IMMIDIATE, DATA_OUTPUT]
 
-	COMMANDS = [COMMAND_START_CURRENT_FILE, COMMAND_GO_TO, COMMAND_ADD_WATCH, COMMAND_GET_WATCH, COMMAND_START, COMMAND_STOP, COMMAND_SEND_INPUT, COMMAND_STEP_OVER, COMMAND_STEP_INTO, COMMAND_STEP_UP, COMMAND_STEP_DOWN, COMMAND_CONTINUTE, COMMAND_JUMP, COMMAND_GET_LOCATION, COMMAND_GET_STACKTRACE, COMMAND_GET_LOCALS, COMMAND_GET_THREADS, COMMAND_GET_EXPRESSION, COMMAND_GET_BREAKPOINTS, COMMAND_SET_BREAKPOINT, COMMAND_CLEAR_BREAKPOINTS]
+	COMMANDS = [COMMAND_START_RAILS, COMMAND_INTERRUPT, COMMAND_START_CURRENT_FILE, COMMAND_GO_TO, COMMAND_ADD_WATCH, COMMAND_GET_WATCH, COMMAND_START, COMMAND_STOP, COMMAND_SEND_INPUT, COMMAND_STEP_OVER, COMMAND_STEP_INTO, COMMAND_STEP_UP, COMMAND_STEP_DOWN, COMMAND_CONTINUTE, COMMAND_JUMP, COMMAND_GET_LOCATION, COMMAND_GET_STACKTRACE, COMMAND_GET_LOCALS, COMMAND_GET_THREADS, COMMAND_GET_EXPRESSION, COMMAND_GET_BREAKPOINTS, COMMAND_SET_BREAKPOINT, COMMAND_CLEAR_BREAKPOINTS]
 	MOVEMENT_COMMANDS = [COMMAND_CONTINUTE, COMMAND_STEP_OVER, COMMAND_STEP_INTO, COMMAND_STEP_UP, COMMAND_STEP_DOWN, COMMAND_JUMP]
 	BREAKPOINTS = []
 
@@ -83,6 +84,8 @@ class DebuggerModel(object):
 		self.line_number = None
 
 	def update_data(self, data_type, new_value):
+		line_to_show = None
+
 		if data_type not in self.data.keys():
 			return False
 
@@ -91,19 +94,24 @@ class DebuggerModel(object):
 
 		if data_type == DebuggerModel.DATA_WATCH:
 			self.update_watch_expression(new_value[0], new_value[1])
-			return self.watch_to_str()
+			return self.watch_to_str(), line_to_show
 		elif data_type == DebuggerModel.DATA_IMMIDIATE:
 			self.data[data_type] += new_value[0]+" => "+ new_value[1] + "\n"
 			self.referesh_data()
 		elif data_type in DebuggerModel.APPENDABLE_DATA:
 			if not new_value.endswith("\n"):
 				new_value = new_value + "\n"
-				 
+
 			self.data[data_type] += new_value
 		else:
 			self.data[data_type] = new_value
 
-		return self.data[data_type]
+		if data_type == DebuggerModel.DATA_STACK:
+			for idx, line in enumerate(self.data[data_type].splitlines()):
+				if line.startswith("-->"):
+					line_to_show = idx
+
+		return self.data[data_type], line_to_show
 
 	def referesh_data(self):
 		# Refresh autoreferesh data
@@ -132,10 +140,10 @@ class DebuggerModel(object):
 
 	def get_current_file(self):
 		return self.file_name
-		
+
 	def get_all_breakpoints(self):
 		breakpoints = []
 		for breakpoint in DebuggerModel.BREAKPOINTS:
 			breakpoints.append((breakpoint.file_name, breakpoint.line_number, breakpoint.condition))
 
-		return breakpoints 
+		return breakpoints

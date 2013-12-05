@@ -23,8 +23,9 @@ class RubyDebugger(Debugger):
 				 DebuggerModel.COMMAND_GET_WATCH:RubyCustomDebugCommand(lambda debugger_constroller, prefix, expression: debugger_constroller.send_with_result("eval " + expression, DebuggerModel.DATA_WATCH, prefix)),
 				 DebuggerModel.COMMAND_GET_EXPRESSION:RubyCustomDebugCommand(lambda debugger_constroller, prefix, expression: debugger_constroller.send_with_result("eval " + expression, DebuggerModel.DATA_IMMIDIATE, prefix)),
 
-				 DebuggerModel.COMMAND_SET_BREAKPOINT:RubyDebugCommand("b", "set_breakpoint"),
-				 DebuggerModel.COMMAND_CLEAR_BREAKPOINTS:RubyDebugCommand(["delete", "y"], "clear_breakpoint"),
+				 DebuggerModel.COMMAND_SET_BREAKPOINT:RubyCustomDebugCommand(lambda debugger_constroller, location: debugger_constroller.send_control_command("b " + location)),
+				 DebuggerModel.COMMAND_CLEAR_BREAKPOINTS:RubyCustomDebugCommand(lambda debugger_constroller: debugger_constroller.send_control_command("delete")),
+				 DebuggerModel.COMMAND_INTERRUPT:RubyCustomDebugCommand(lambda debugger_constroller: debugger_constroller.send_control_command("interrupt")),
 
 				 DebuggerModel.COMMAND_STEP_OVER:RubyDebugCommand("n", "step_over"),
 				 DebuggerModel.COMMAND_STEP_INTO:RubyDebugCommand("s", "step_into"),

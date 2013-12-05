@@ -58,13 +58,19 @@ class ViewHelper(object):
 		while view.is_loading():
 			pass
 		view.add_regions("debugger", [view.lines(sublime.Region(0, view.size()))[line_number-1]], "lineHighlight", "")
-		view.show_at_center(view.line(view.text_point(line_number,0)))
+		view.show(view.text_point(line_number-1,0))
 
-	def replace_content(window, view, new_content):
+		if view not in window.views_in_group(0):
+			window.set_view_index(view, 0, len(window.views_in_group(0)))
+
+	def replace_content(window, view, new_content, line_to_show = None):
 		view.set_read_only(False)
 		view.run_command('erase_all')
 		view.run_command('append', {'characters': new_content})
 		view.set_read_only(True)
+		if not line_to_show:
+			line_to_show = len(view.lines(sublime.Region(0, view.size())))
+		view.show(view.text_point(line_to_show-1, 0))
 
 		if view.name() not in DebuggerModel.REFRESHABLE_DATA:
 			ViewHelper.move_to_front(window, view)
@@ -73,13 +79,17 @@ class ViewHelper(object):
 		for view in window.views():
 			if PathHelper.is_same_path(view.file_name(), file_name):
 				return ViewHelper.get_lines(view, view.sel())[0]
-				
+
 		return None
 
 	def move_to_front(window, debug_view):
 		current_active = window.active_view()
 		active_group = window.views_in_group(window.active_group())
-		window.focus_view(debug_view)
 
-		if debug_view not in active_group:
-			window.focus_view(current_active)
+		for group in range(0, window.num_groups()):
+			if debug_view in window.views_in_group(group):
+				if debug_view != window.active_view_in_group(group):
+					window.focus_view(debug_view)
+					if debug_view not in active_group:
+						window.focus_view(current_active)
+

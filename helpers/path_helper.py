@@ -1,3 +1,5 @@
+import sublime
+import os
 from os import path
 
 class PathHelper(object):
@@ -12,3 +14,6 @@ class PathHelper(object):
 
 	def is_same_path(first, second):
 		return path.abspath(first) == path.abspath(second)
+
+	def get_sublime_require():
+		return os.path.join(sublime.packages_path(), "RubyDebugger", "sublime_debug_require.rb")

@@ -11,13 +11,13 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		self.debugger = None
 		self.debugger_model = None
 
-	def run(self, command = None, **args):
+	def run(self, command, **args):
 		# Allow only known commands
 		if command not in DebuggerModel.COMMANDS:
 			sublime.message_dialog("Unknown command: "+command)
 			return
 		# Allow only start command when inactive
-		if not self.debugger and command not in [DebuggerModel.COMMAND_START, DebuggerModel.COMMAND_START_CURRENT_FILE]:
+		if not self.debugger and command not in [DebuggerModel.COMMAND_START_RAILS,DebuggerModel.COMMAND_START, DebuggerModel.COMMAND_START_CURRENT_FILE]:
 			return
 
 		# Cursor movement commands
@@ -49,6 +49,8 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		elif command == DebuggerModel.COMMAND_ADD_WATCH:
 			self.window.show_input_panel("Enter watch expression", '', lambda exp: self.on_watch_entered(exp), None, None)
 		# Start command
+		elif command == DebuggerModel.COMMAND_START_RAILS:
+			self.start_command("script/rails s")
 		elif command == DebuggerModel.COMMAND_START_CURRENT_FILE:
 			self.start_command(self.window.active_view().file_name())
 		elif command == DebuggerModel.COMMAND_START:
@@ -63,7 +65,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 	def start_command(self, file_name):
 		file_name, *arguments = file_name.split(" ")
 		file_path, is_legal = PathHelper.get_file(file_name, self.window)
-	
+
 		if is_legal:
 			sublime.set_timeout_async(lambda file_path=file_path, args=arguments: self.start_command_async(file_path, *args), 0)
 		else:
@@ -115,13 +117,15 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		ViewHelper.move_to_front(self.window, self.debug_views[DebuggerModel.DATA_WATCH])
 
 	def add_text_result(self, result, reason):
-		new_data = self.debugger_model.update_data(reason, result)
+		result = self.debugger_model.update_data(reason, result)
 
-		if new_data:
-			ViewHelper.replace_content(self.window, self.debug_views[reason], new_data)
+		if result:
+			new_data = result[0]
+			line_to_show = result[1]
+			ViewHelper.replace_content(self.window, self.debug_views[reason], new_data, line_to_show)
 
 	def set_cursor(self, file_name, line_number):
-		# Updating only if position changed 
+		# Updating only if position changed
 		if self.debugger_model.set_cursor(file_name, line_number):
 			ViewHelper.set_cursor(self.window, file_name, line_number)
 
@@ -136,4 +140,4 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		self.debugger = None
 		self.debugger_model = None
 
-		ViewHelper.reset_debug_layout(self.window, self.debug_views) 
+		# ViewHelper.reset_debug_layout(self.window, self.debug_views)

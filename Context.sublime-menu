@@ -30,7 +30,7 @@
 				"caption": "Jump to cursor",
 				"command": "debug",
 				"args": {"command":"jump"}
-			},
+			}
 		]
 	}
 ]

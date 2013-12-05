@@ -1,5 +1,5 @@
 import sublime, sublime_plugin
-from RubyDebugger.helpers.view_helper import ViewHelper 
+from RubyDebugger.helpers.view_helper import ViewHelper
 from RubyDebugger.models.debugger_model import DebuggerModel
 from RubyDebugger.models.breakpoint import Breakpoint
 
@@ -22,13 +22,14 @@ class ToggleBreakpointCommand(sublime_plugin.TextCommand):
 	def update_breakpoints(self, condition=None):
 		self.view.erase_regions("breakpoint")
 		selected_lines = ViewHelper.get_lines(self.view, self.view.sel())
-		self.update_regions(selected_lines, condition)
+		self.update_regions(self.view.file_name(), selected_lines, condition)
 		self.view.window().run_command("debug", {"command" : "set_breakpoint"})
 
-	def update_regions(self, selcted_line_numbers, condition):
+	def update_regions(self, selected_file, selcted_line_numbers, condition):
 		current_breakpoints = DebuggerModel.BREAKPOINTS
 
 		unchanged = []
+		unchanged_in_selected_file = []
 		added = []
 
 		for breakpoint in current_breakpoints:
@@ -38,7 +39,10 @@ class ToggleBreakpointCommand(sublime_plugin.TextCommand):
 					was_found = True
 					break
 
-			if not was_found:
+			if not was_found and breakpoint.file_name == selected_file:
+				unchanged_in_selected_file += [breakpoint]
+
+			if not was_found :
 				unchanged += [breakpoint]
 
 		for line_number in selcted_line_numbers:
@@ -51,11 +55,11 @@ class ToggleBreakpointCommand(sublime_plugin.TextCommand):
 			if not was_found:
 				added += [self.create_breakpoint(line_number, condition)]
 
-		self.view.add_regions("breakpoint", self.to_regions(added+unchanged), "string", "circle", sublime.PERSISTENT)
+		self.view.add_regions("breakpoint", self.to_regions(added+unchanged_in_selected_file), "string", "circle", sublime.PERSISTENT)
 		DebuggerModel.BREAKPOINTS = added+unchanged
 
 	def create_breakpoint(self, line_number, condition):
-		return Breakpoint(self.view.file_name(), line_number+1, condition)		
+		return Breakpoint(self.view.file_name(), line_number+1, condition)
 
 	def create_region(self, breakpoint):
 		point = self.view.text_point(breakpoint.line_number-1, 0)
