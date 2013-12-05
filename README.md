@@ -1,6 +1,3 @@
-Sublime Debugger
-================
-
 # SublimeRubyDebugger
 debugger plugin for interactive ruby and RoR debugging onSublime Text.
 
@@ -18,7 +15,7 @@ Based [Debugger gem](https://github.com/cldwalker/debugger) package by [Shuky ch
 * [License](#license)
 * [Todos](#todo)
 
-## First Steps
+## First steps
 In order to start debugging ruby or RoR applications all you need to do
 
 is to [install](#installation) Debugger plugin and press on
@@ -55,7 +52,7 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 #### Breakpoints
 * Toggle Breakpoint - <kbd>F9</kbd>
 * Toggle Conditional Breakpoint - <kbd>Shift+F9</kbd>
-* Clear Breakpoints
+* Clear Breakpoints - <kbd>Alt+Shift+F9</kbd>
 
 #### Cursor control
 * Step Over - <kbd>F10</kbd>
@@ -94,7 +91,7 @@ Get the latest [source from GitHub](https://github.com/shuky19/sublime_debugger/
 
 ## Troubleshoot
 
-#### Why do i get on the output window "Last exception: #<Errno::EADDRINUSE: Address already in use - bind(2)>"?
+#### Why do i get on the output window "Last exception: <Errno::EADDRINUSE: Address already in use - bind(2)>"?
 Thats because there is another process running on your OS who is using the port 8989/8990
 
 Another option is that the last debugger process is stil alive
