@@ -1,7 +1,7 @@
 [
 	{ "keys": ["f6"], "command": "debug", "args": {"command":"start_debug"} },
-	{ "keys": ["shift+f6"], "command": "debug", "args": {"command":"start_debug_current_file"} },
-	{ "keys": ["alt+f6"], "command": "debug", "args": {"command":"start_rails"} },
+	{ "keys": ["shift+f6"], "command": "debug", "args": {"command":"start_rails"} },
+	{ "keys": ["alt+shift+f6"], "command": "debug", "args": {"command":"start_debug_current_file"} },
 	{ "keys": ["f7"], "command": "debug", "args": {"command":"get_expression"} },
 	{ "keys": ["f8"], "command": "debug", "args": {"command":"continute"} },
 	{ "keys": ["f9"], "command": "toggle_breakpoint", "args": {"mode": "normal"} },
@@ -11,7 +11,7 @@
 	{ "keys": ["ctrl+f10"], "command": "debug", "args": {"command":"go_to"} },
 	{ "keys": ["ctrl+shift+f10"], "command": "debug", "args": {"command":"jump"} },
 	{ "keys": ["f11"], "command": "debug", "args": {"command":"step_into"} },
-	{ "keys": ["ctrl+alt+break"], "command": "debug", "args": {"command":"interrupt"} },
+	{ "keys": ["alt+d", "b"], "command": "debug", "args": {"command":"interrupt"} },
 	{ "keys": ["alt+l", "s"], "command": "debug", "args": {"command":"show_debug_windows"} },
 	{ "keys": ["alt+l", "h"], "command": "debug", "args": {"command":"hide_debug_windows"} },
 	{ "keys": ["alt+d", "u"], "command": "debug", "args": {"command":"step_up"} },
