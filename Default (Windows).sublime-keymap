@@ -12,12 +12,11 @@
 	{ "keys": ["ctrl+shift+f10"], "command": "debug", "args": {"command":"jump"} },
 	{ "keys": ["f11"], "command": "debug", "args": {"command":"step_into"} },
 	{ "keys": ["ctrl+alt+break"], "command": "debug", "args": {"command":"interrupt"} },
-	{ "keys": ["alt+d", "alt+t"], "command": "debug", "args": {"command":"get_threads"} },
-	{ "keys": ["alt+d", "alt+l"], "command": "debug", "args": {"command":"get_locals"} },
-	{ "keys": ["alt+d", "alt+s"], "command": "debug", "args": {"command":"get_stacktrace"} },
-	{ "keys": ["alt+d", "alt+u"], "command": "debug", "args": {"command":"step_up"} },
-	{ "keys": ["alt+d", "alt+d"], "command": "debug", "args": {"command":"step_down"} },
-	{ "keys": ["alt+d", "alt+k"], "command": "debug", "args": {"command":"stop_debug"} },
-	{ "keys": ["alt+d", "alt+i"], "command": "debug", "args": {"command":"send_input"} },
-	{ "keys": ["alt+d", "alt+w"], "command": "debug", "args": {"command":"add_watch"} }
+	{ "keys": ["alt+l", "s"], "command": "debug", "args": {"command":"show_debug_windows"} },
+	{ "keys": ["alt+l", "h"], "command": "debug", "args": {"command":"hide_debug_windows"} },
+	{ "keys": ["alt+d", "u"], "command": "debug", "args": {"command":"step_up"} },
+	{ "keys": ["alt+d", "d"], "command": "debug", "args": {"command":"step_down"} },
+	{ "keys": ["alt+d", "k"], "command": "debug", "args": {"command":"stop_debug"} },
+	{ "keys": ["alt+d", "i"], "command": "debug", "args": {"command":"send_input"} },
+	{ "keys": ["alt+d", "w"], "command": "debug", "args": {"command":"add_watch"} }
 ]

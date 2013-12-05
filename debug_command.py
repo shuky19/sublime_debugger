@@ -10,6 +10,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		super(DebugCommand, self).__init__(window)
 		self.debugger = None
 		self.debugger_model = None
+		self.debug_views = None
 
 	def run(self, command, **args):
 		# Allow only known commands
@@ -17,7 +18,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			sublime.message_dialog("Unknown command: "+command)
 			return
 		# Allow only start command when inactive
-		if not self.debugger and command not in [DebuggerModel.COMMAND_START_RAILS,DebuggerModel.COMMAND_START, DebuggerModel.COMMAND_START_CURRENT_FILE]:
+		if not self.debugger and command not in DebuggerModel.STARTERS_COMMANDS:
 			return
 
 		# Cursor movement commands
@@ -42,6 +43,16 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.debugger.run_command(command, **args)
 			self.debugger.run_command(DebuggerModel.COMMAND_GET_LOCATION)
 		# Input commands
+		elif command == DebuggerModel.COMMAND_DEBUG_LAYOUT:
+			self.show_debugger_layout()
+		elif command == DebuggerModel.COMMAND_RESET_LAYOUT:
+			if not self.debugger_model:
+				self.debugger_model = DebuggerModel(self.debugger)
+
+			if not self.debug_views:
+				self.debug_views = dict([(key, None) for key in self.debugger_model.get_data().keys()])
+
+			ViewHelper.reset_debug_layout(self.window, self.debug_views)
 		elif command == DebuggerModel.COMMAND_SEND_INPUT:
 			self.window.show_input_panel("Enter input", '', lambda input_line: self.on_input_entered(input_line), None, None)
 		elif command == DebuggerModel.COMMAND_GET_EXPRESSION:
@@ -89,6 +100,9 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		self.register_breakpoints()
 
 	def show_debugger_layout(self):
+		if not self.debugger_model:
+			self.debugger_model = DebuggerModel(self.debugger)
+
 		self.debug_views = dict([(key, None) for key in self.debugger_model.get_data().keys()])
 		ViewHelper.init_debug_layout(self.window, self.debug_views)
 
@@ -138,6 +152,5 @@ class DebugCommand(sublime_plugin.WindowCommand):
 	def stop(self):
 		self.clear_cursor()
 		self.debugger = None
-		self.debugger_model = None
 
 		# ViewHelper.reset_debug_layout(self.window, self.debug_views)

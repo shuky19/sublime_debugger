@@ -88,5 +88,15 @@
 		"caption": "Debugger: Run expression",
 		"command": "debug",
 		"args": {"command":"get_expression"}
+	},
+	{
+		"caption": "Debugger: Show debug windows",
+		"command": "debug",
+		"args": {"command":"show_debug_windows"}
+	},
+	{
+		"caption": "Debugger: Hide debug windows",
+		"command": "debug",
+		"args": {"command":"hide_debug_windows"}
 	}
 ]
