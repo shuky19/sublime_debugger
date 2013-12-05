@@ -14,6 +14,8 @@ Based [Debugger gem](https://github.com/cldwalker/debugger) package by [Shuky ch
 * [Troubleshoot](#troubleshoot)
 * [License](#license)
 * [Todos](#todo)
+* [Screen Shots](#screen-shots)
+
 
 ## First steps
 In order to start debugging ruby or RoR applications all you need to do
@@ -110,3 +112,13 @@ SublimeTextXdebug is released under the [MIT License](http://www.opensource.org/
 * Windows checks after new changes
 * Ruby 2.0 support
 * Ruby 1.8.7 support
+
+## Screen Shots
+
+![SublimeRubyDebugger](http://i.imgur.com/PwjudlY.png)
+
+![SublimeRubyDebugger](http://i.imgur.com/Ny6TjMU.png)
+
+![SublimeRubyDebugger](http://i.imgur.com/TkKnrsL.png)
+
+![SublimeRubyDebugger](http://i.imgur.com/nJQ9oTy.png)
