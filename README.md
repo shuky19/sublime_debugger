@@ -32,13 +32,11 @@ is to [install](#installation) Debugger plugin and press on
 * Breakpoints, conditional breakpoints and temporary breakpoints (goto) support.
 * Works on Sublime Text 3 (later version will work on both 2 and 3)
 * MRI 1.9.3 support (using debugger gem).
-* Linux support only
+* Linux, Window, OSX support
 
 ## Soon
 * MRI 2.0 support
 * Sublime 2 support
-* Windows support
-* Mac OS support
 * Edit and remove watch expressions
 
 ## Commands
@@ -108,8 +106,6 @@ SublimeTextXdebug is released under the [MIT License](http://www.opensource.org/
 * Set view cursor on debug cursor change
 * Nice message when port is taken
 * Document & Refacor
-* Mac OS checks
-* Windows checks after new changes
 * Ruby 2.0 support
 * Ruby 1.8.7 support
 

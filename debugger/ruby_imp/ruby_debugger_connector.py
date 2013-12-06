@@ -27,8 +27,6 @@ class RubyDebuggerConnector(DebuggerConnector):
 		Start and attach the process
 		'''
 		# Create new process
-		self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.control_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
 		process_params += args
 		self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
@@ -41,7 +39,9 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.log_message("Connecting... ")
 		for i in range(1,5):
 			try:
+				self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self.client.connect(("localhost", 8989))
+				self.control_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self.control_client.connect(("localhost", 8990))
 				self.connected = True
 				self.log_message("Connected"+'\n')
