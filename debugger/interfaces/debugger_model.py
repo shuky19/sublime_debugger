@@ -89,6 +89,7 @@ class DebuggerModel(object):
 
 	def update_data(self, data_type, new_value):
 		line_to_show = None
+		should_append = False
 
 		if data_type not in self.data.keys():
 			return False
@@ -98,15 +99,17 @@ class DebuggerModel(object):
 
 		if data_type == DebuggerModel.DATA_WATCH:
 			self.update_watch_expression(new_value[0], new_value[1])
-			return self.watch_to_str(), line_to_show
+			return self.watch_to_str(), line_to_show, should_append
 		elif data_type == DebuggerModel.DATA_IMMIDIATE:
-			self.data[data_type] += new_value[0]+" => "+ new_value[1] + "\n"
+			self.data[data_type] += new_value[0]+" => "+ new_value[1] + '\n'
 			self.referesh_data()
 		elif data_type in DebuggerModel.APPENDABLE_DATA:
-			if not new_value.endswith("\n"):
-				new_value = new_value + "\n"
-
+			should_append = True
+			if not new_value.endswith('\n'):
+				new_value = new_value + '\n'
+			new_value = new_value.replace("\r\n", '\n')
 			self.data[data_type] += new_value
+			return new_value, line_to_show, should_append
 		else:
 			self.data[data_type] = new_value
 
@@ -115,7 +118,7 @@ class DebuggerModel(object):
 				if line.startswith("-->"):
 					line_to_show = idx
 
-		return self.data[data_type], line_to_show
+		return self.data[data_type], line_to_show, should_append
 
 	def referesh_data(self):
 		# Refresh autoreferesh data
@@ -140,7 +143,7 @@ class DebuggerModel(object):
 		for exp, value in self.data[DebuggerModel.DATA_WATCH]:
 			result.append(exp + " = " + value)
 
-		return "\n".join(result)
+		return '\n'.join(result)
 
 	def get_current_file(self):
 		return self.file_name

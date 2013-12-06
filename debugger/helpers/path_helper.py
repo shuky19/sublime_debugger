@@ -3,11 +3,29 @@ import os
 from os import path
 
 class PathHelper(object):
-	def get_file(file_name, window):
-		if not path.isabs(file_name):
-			file_name = path.join(window.folders()[0], file_name)
+	def get_file(command, window, *arguments):
+		is_legal = False
+		file_name = ""
+		parts = command.split(" ")
+		arguments = []
 
-		return file_name, path.isfile(file_name)
+		for part in parts:
+			if is_legal:				
+				arguments.append(part)
+				continue
+		
+			elif file_name == "":
+				file_name = part
+			else:
+				file_name = " ".join([file_name,part])
+
+			if path.isfile(file_name):
+				is_legal = True
+			elif path.isfile(path.join(window.folders()[0], file_name)):
+				file_name = path.join(window.folders()[0], file_name)
+				is_legal = True
+
+		return is_legal, file_name, arguments
 
 	def get_pwd(file_name):
 		return path.split(file_name)[0]
@@ -16,4 +34,4 @@ class PathHelper(object):
 		return path.abspath(first) == path.abspath(second)
 
 	def get_sublime_require():
-		return os.path.join(sublime.packages_path(), "RubyDebugger", "sublime_debug_require.rb")
+		return os.path.join(sublime.packages_path(), "sublime_debugger-master", "sublime_debug_require.rb")

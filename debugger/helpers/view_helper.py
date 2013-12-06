@@ -67,9 +67,11 @@ class ViewHelper(object):
 		if view not in window.views_in_group(0):
 			window.set_view_index(view, 0, len(window.views_in_group(0)))
 
-	def replace_content(window, view, new_content, line_to_show = None):
+	def replace_content(window, view, new_content, line_to_show, should_append):
 		view.set_read_only(False)
-		view.run_command('erase_all')
+		if not should_append:
+			view.run_command('erase_all')
+
 		view.run_command('append', {'characters': new_content})
 		view.set_read_only(True)
 		if not line_to_show:

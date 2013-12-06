@@ -70,8 +70,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.debugger.run_command(command)
 
 	def start_command(self, file_name):
-		file_name, *arguments = file_name.split(" ")
-		file_path, is_legal = PathHelper.get_file(file_name, self.window)
+		is_legal, file_path, *arguments = PathHelper.get_file(file_name, self.window)
 
 		if is_legal:
 			sublime.set_timeout_async(lambda file_path=file_path, args=arguments: self.start_command_async(file_path, *args), 0)
@@ -132,7 +131,8 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		if result:
 			new_data = result[0]
 			line_to_show = result[1]
-			ViewHelper.replace_content(self.window, self.debug_views[reason], new_data, line_to_show)
+			should_append = result[2]
+			ViewHelper.replace_content(self.window, self.debug_views[reason], new_data, line_to_show, should_append)
 
 	def set_cursor(self, file_name, line_number):
 		# Updating only if position changed

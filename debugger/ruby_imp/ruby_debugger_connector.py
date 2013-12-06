@@ -1,3 +1,5 @@
+import os.path
+import sublime
 import time
 import traceback
 import socket
@@ -42,7 +44,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.client.connect(("localhost", 8989))
 				self.control_client.connect(("localhost", 8990))
 				self.connected = True
-				self.log_message("Connected"+"\n")
+				self.log_message("Connected"+'\n')
 
 				# Start reader thread
 				self.reader = Thread(target=self.reader_thread)
@@ -51,7 +53,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				break
 			except Exception as ex:
 				if i == 4:
-					self.log_message("Connection could not be made: "+str(ex)+"\n")
+					self.log_message("Connection could not be made: "+str(ex)+'\n')
 				else:
 					time.sleep(1)
 
@@ -97,7 +99,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 		except Exception as ex:
 			if self.connected:
-				self.log_message("Debugger exception: "+str(ex)+"\n StackTrace: "+traceback.format_exc())
+				self.log_message("Debugger exception: "+str(ex)+'\n'+" StackTrace: "+traceback.format_exc())
 				self.connected = False
 
 		self.outputer.join()
@@ -117,7 +119,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			file_name, line_number = self.get_current_position()
 
 			# Check wheather position was updated
-			if file_name != "" and "sub_debug.rb" not in file_name:
+			if file_name != "" and not PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
 				self.debugger.signal_position_changed(file_name, line_number)
 
 			try:
@@ -137,7 +139,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				else:
 					pass
 
-				if "sub_debug.rb" in file_name:
+				if PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
 					self.debugger.run_command(DebuggerModel.COMMAND_CONTINUTE)
 			except queue.Empty:
 				pass
@@ -153,7 +155,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.send_data_internal(command)
 
 	def send_input(self, command):
-		self.process.stdin.write(bytes(command+"\n","UTF-8"))
+		self.process.stdin.write(bytes(command+'\n',"UTF-8"))
 		self.process.stdin.flush()
 
 	def send_control_command(self, command):
@@ -161,18 +163,20 @@ class RubyDebuggerConnector(DebuggerConnector):
 			return
 
 		try:
-			self.control_client.sendall(bytes(command+"\n", 'UTF-8'))
+			self.control_client.sendall(bytes(command+'\n', 'UTF-8'))
 		except Exception as e:
-			self.log_message("Failed communicate with process ("+command+"): "+str(e))
+			if self.connected:
+				self.log_message("Failed communicate with process ("+command+"): "+str(e))
 
 	def send_data_internal(self, command):
 		if not self.connected:
 			return
 
 		try:
-			self.client.sendall(bytes(command+"\n", 'UTF-8'))
+			self.client.sendall(bytes(command+'\n', 'UTF-8'))
 		except Exception as e:
-			self.log_message("Failed communicate with process ("+command+"): "+str(e))
+			if self.connected:
+				self.log_message("Failed communicate with process ("+command+"): "+str(e))
 
 	def send_for_result(self, command, reason):
 		self.requests.put({"signal": True, "reason": reason, "command": command})
@@ -188,7 +192,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			if self.is_an_ending_line(line):
 				result.insert(len(result), "")
 			else:
-				result[len(result)-1] += line + "\n"
+				result[len(result)-1] += line + '\n'
 
 		return result
 
