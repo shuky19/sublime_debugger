@@ -1,10 +1,6 @@
 import sublime
 from ..interfaces.debugger_model import DebuggerModel
-
-try:
-	from .path_helper import PathHelper
-except:
-	from path_helper import PathHelper
+from .path_helper import PathHelper
 
 class ViewHelper(object):
 	def region_in_line(region, line):
