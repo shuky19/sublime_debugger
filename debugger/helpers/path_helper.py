@@ -10,10 +10,10 @@ class PathHelper(object):
 		arguments = []
 
 		for part in parts:
-			if is_legal:				
+			if is_legal:
 				arguments.append(part)
 				continue
-		
+
 			elif file_name == "":
 				file_name = part
 			else:
@@ -34,4 +34,4 @@ class PathHelper(object):
 		return path.abspath(first) == path.abspath(second)
 
 	def get_sublime_require():
-		return os.path.join(sublime.packages_path(), "sublime_debugger-master", "sublime_debug_require.rb")
+		return os.path.join(sublime.packages_path(), "RubyDebugger", "sublime_debug_require.rb")
