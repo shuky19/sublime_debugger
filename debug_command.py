@@ -1,9 +1,10 @@
 import sublime, sublime_plugin
-from RubyDebugger.helpers.path_helper import PathHelper
-from RubyDebugger.models.debugger_model import DebuggerModel
-from RubyDebugger.helpers.view_helper import ViewHelper
-from RubyDebugger.debuggers.debugger import Debugger
-from RubyDebugger.debuggers.ruby_debugger import RubyDebugger
+
+# Load modules
+try:
+    from .ruby_debugger import *
+except:
+    from ruby_debugger import *
 
 class DebugCommand(sublime_plugin.WindowCommand):
 	def __init__(self, window):

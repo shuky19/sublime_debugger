@@ -1,4 +1,11 @@
 import sublime, sublime_plugin
+
+# Load modules
+try:
+    from .ruby_debugger import *
+except:
+    from ruby_debugger import *
+
 from RubyDebugger.helpers.view_helper import ViewHelper
 from RubyDebugger.models.debugger_model import DebuggerModel
 from RubyDebugger.models.breakpoint import Breakpoint
