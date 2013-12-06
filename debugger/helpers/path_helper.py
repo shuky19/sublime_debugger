@@ -3,7 +3,7 @@ import os
 from os import path
 
 class PathHelper(object):
-	def get_file(command, window, *arguments):
+	def get_file(command, window):
 		is_legal = False
 		file_name = ""
 		parts = command.split(" ")

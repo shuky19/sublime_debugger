@@ -70,7 +70,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.debugger.run_command(command)
 
 	def start_command(self, file_name):
-		is_legal, file_path, *arguments = PathHelper.get_file(file_name, self.window)
+		is_legal, file_path, arguments = PathHelper.get_file(file_name, self.window)
 
 		if is_legal:
 			sublime.set_timeout_async(lambda file_path=file_path, args=arguments: self.start_command_async(file_path, *args), 0)
