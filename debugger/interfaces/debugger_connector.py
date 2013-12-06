@@ -1,5 +1,9 @@
-from RubyDebugger.models.debugger_model import DebuggerModel
 from abc import ABCMeta, abstractmethod
+
+try:
+	from .debugger_model import DebuggerModel
+except:
+	from debugger_model import DebuggerModel
 
 class DebuggerConnector(object):
 	"""Connector used to communication with debugged process"""
@@ -18,7 +22,7 @@ class DebuggerConnector(object):
 		Start and attach the process
 		'''
 		pass
-	
+
 	@abstractmethod
 	def send_data(self, command, reason):
 		'''

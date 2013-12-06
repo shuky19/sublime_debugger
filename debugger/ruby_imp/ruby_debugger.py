@@ -1,17 +1,8 @@
 import sublime
-
-try:
-	from .debuggers.debugger import Debugger
-	from .connectors.ruby_debugger_connector import RubyDebuggerConnector
-	from .models.debugger_model import DebuggerModel
-	from .models.ruby.ruby_debug_command import RubyDebugCommand
-	from .models.ruby.ruby_custom_debug_command import RubyCustomDebugCommand
-except:
-	from debuggers.debugger import Debugger
-	from connectors.ruby_debugger_connector import RubyDebuggerConnector
-	from models.debugger_model import DebuggerModel
-	from models.ruby.ruby_debug_command import RubyDebugCommand
-	from models.ruby.ruby_custom_debug_command import RubyCustomDebugCommand
+from ..interfaces import *
+from .ruby_debugger_connector import RubyDebuggerConnector
+from .ruby_debug_command import RubyDebugCommand
+from .ruby_custom_debug_command import RubyCustomDebugCommand
 
 class RubyDebugger(Debugger):
 	# Define protocol

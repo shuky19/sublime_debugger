@@ -1,4 +1,4 @@
-from RubyDebugger.models.debug_command import DebugCommand
+from ..interfaces import *
 
 class RubyCustomDebugCommand(DebugCommand):
 	"""Represent send start debug command"""

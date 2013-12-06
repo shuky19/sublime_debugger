@@ -7,9 +7,8 @@ from io import StringIO
 from threading import Thread
 import queue
 from queue import Queue
-from RubyDebugger.helpers.path_helper import PathHelper
-from RubyDebugger.models.debugger_model import DebuggerModel
-from RubyDebugger.connectors.debugger_connector import DebuggerConnector
+from ..interfaces import *
+from ..helpers import *
 
 class RubyDebuggerConnector(DebuggerConnector):
 	"""Connector used to communication with debugged process"""

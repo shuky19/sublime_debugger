@@ -1,10 +1,5 @@
 import sublime, sublime_plugin
-
-# Load modules
-try:
-    from .ruby_debugger import *
-except:
-    from ruby_debugger import *
+from .debugger import *
 
 class DebugCommand(sublime_plugin.WindowCommand):
 	def __init__(self, window):
