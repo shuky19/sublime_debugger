@@ -57,7 +57,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.window.show_input_panel("Enter watch expression", '', lambda exp: self.on_watch_entered(exp), None, None)
 		# Start command
 		elif command == DebuggerModel.COMMAND_START_RAILS:
-			self.start_command("bin/rails s")
+			self.start_command("script/rails s")
 		elif command == DebuggerModel.COMMAND_START_CURRENT_FILE:
 			self.start_command(self.window.active_view().file_name())
 		elif command == DebuggerModel.COMMAND_START:
@@ -103,8 +103,9 @@ class DebugCommand(sublime_plugin.WindowCommand):
 
 	def register_breakpoints(self):
 		self.debugger.run_command(DebuggerModel.COMMAND_CLEAR_BREAKPOINTS)
+		ViewHelper.sync_breakpoints(self.window)
 
-		for file_name, line_number, condition in self.debugger_model.get_all_breakpoints(	):
+		for file_name, line_number, condition in self.debugger_model.get_all_breakpoints():
 			if condition:
 				condition = " if "+condition
 			else:

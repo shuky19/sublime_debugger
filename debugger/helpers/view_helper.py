@@ -95,3 +95,7 @@ class ViewHelper(object):
 					if debug_view not in active_group:
 						window.focus_view(current_active)
 
+	def sync_breakpoints(window):
+		for view in window.views():
+			view.run_command("toggle_breakpoint", {"mode":"refresh"})
+

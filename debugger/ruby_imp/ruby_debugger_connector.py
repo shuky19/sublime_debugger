@@ -93,7 +93,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				result = str(bytes, "UTF-8")
 				self.data.write(result)
 				self.data.flush()
-				self.log_message(result)
+				# self.log_message(result)
 
 				if self.has_end_stream():
 					self.handle_response()
@@ -216,7 +216,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = re.match(r"^=>\s.(\d+): .*$", line)
+			match = re.match(r"^=>\s+?(\d+): .*$", line)
 
 			if match:
 				current_line = match.groups()[0]
