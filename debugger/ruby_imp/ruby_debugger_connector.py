@@ -37,7 +37,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 		self.connected = False
 		self.log_message("Connecting... ")
-		for i in range(1,5):
+		for i in range(1,9):
 			try:
 				self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self.client.connect(("localhost", 8989))
@@ -52,7 +52,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.reader.start()
 				break
 			except Exception as ex:
-				if i == 4:
+				if i == 8:
 					self.log_message("Connection could not be made: "+str(ex)+'\n')
 				else:
 					time.sleep(1)
@@ -93,6 +93,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				result = str(bytes, "UTF-8")
 				self.data.write(result)
 				self.data.flush()
+				self.log_message(result)
 
 				if self.has_end_stream():
 					self.handle_response()
@@ -121,6 +122,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			# Check wheather position was updated
 			if file_name != "" and not PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
 				self.debugger.signal_position_changed(file_name, line_number)
+				self.log_message("New position: "+file_name+":"+str(line_number))
 
 			try:
 				request = self.requests.get_nowait()
@@ -205,7 +207,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 		return end_of_stream
 
 	def is_an_ending_line(self, line):
-		return re.match(r"PROMPT \(rdb:\d+\) ", line)
+		# return re.match(r"PROMPT \(rdb:\d+\) ", line)
+		return re.match(r"PROMPT \(byebug\) ", line)
 
 	def get_current_position(self):
 		current_line = -1
@@ -213,7 +216,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = re.match(r"^=> (\d+) .*$", line)
+			match = re.match(r"^=>\s.(\d+): .*$", line)
 
 			if match:
 				current_line = match.groups()[0]

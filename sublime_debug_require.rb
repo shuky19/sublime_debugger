@@ -1,7 +1,7 @@
 begin
-  require 'debugger'
+  require 'byebug'
 rescue LoadError
-  puts "Debugger gem is not installed for this ruby version: #{RUBY_VERSION}"
+  puts "Byebug gem is not installed for this ruby version: #{RUBY_VERSION}"
   puts "please run 'gem install debugger' while using your default ruby version"
   exit
 end
@@ -15,7 +15,7 @@ at_exit {
   end
 }
 
-Debugger.wait_connection = true
-Debugger.start_remote "127.0.0.1"
+Byebug.wait_connection = true
+Byebug.start_server "127.0.0.1"
 
-debugger
+byebug
