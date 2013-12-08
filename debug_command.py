@@ -57,7 +57,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.window.show_input_panel("Enter watch expression", '', lambda exp: self.on_watch_entered(exp), None, None)
 		# Start command
 		elif command == DebuggerModel.COMMAND_START_RAILS:
-			self.start_command("bin/rails s")
+			self.start_command("script/rails s")
 		elif command == DebuggerModel.COMMAND_START_CURRENT_FILE:
 			self.start_command(self.window.active_view().file_name())
 		elif command == DebuggerModel.COMMAND_START:
