@@ -80,7 +80,7 @@ Search in the list and install package `Debugger`.
 
 #### Git
 Clone the repository by executing the following command in your Packages directory:
-```git clone https://github.com/shuky19/sublime_debugger.git "Debugger"```
+```git clone https://github.com/shuky19/sublime_debugger.git "RubyDebugger"```
 
 #### Download
 Get the latest [source from GitHub](https://github.com/shuky19/sublime_debugger/archive/master.zip) and extract the source into your Packages directory.
