@@ -76,7 +76,7 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 
 #### [Package Control](https://sublime.wbond.net/)
 Execute __"Package Control: Install Package"__ in the Command Pallette to retrieve a list of available packages.
-Search in the list and install package `Debugger`.
+Search in the list and install package `Ruby Debugger`.
 
 #### Git
 Clone the repository by executing the following command in your Packages directory:
