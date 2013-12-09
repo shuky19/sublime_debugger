@@ -5,6 +5,13 @@ from .ruby_debug_command import RubyDebugCommand
 from .ruby_custom_debug_command import RubyCustomDebugCommand
 
 class RubyDebugger(Debugger):
+	PROTOCOL = {"1.9.3": {"end_regex":r"PROMPT \(rdb:\d+\) ",
+							 "line_regex":r"^=>\s+?(\d+): .*$"},
+							 "file_regex":r"\[-*\d+, \d+\] in (.*)$"}}
+					"2.0.0": {"end_regex":r"PROMPT \(byebug\) ",
+							  "line_regex":r"^=>\s+?(\d+): .*$",
+							  "file_regex":r"\[-*\d+, \d+\] in (.*)$"}}
+
 	# Define protocol
 	COMMANDS = { DebuggerModel.COMMAND_GET_LOCATION:RubyDebugCommand("l=", "GetLocation"),
 				 DebuggerModel.COMMAND_GET_STACKTRACE:RubyDebugCommand("where", DebuggerModel.DATA_STACK, True),
@@ -40,3 +47,12 @@ class RubyDebugger(Debugger):
 
 	def run_result_command(self, command_type, prefix, *args):
 		RubyDebugger.COMMANDS[command_type].execute(self.connector, prefix, *args)
+
+	def match_ending(ruby_version, line):
+		return re.match(PROTOCOL[ruby_version]["end_regex"], line)
+
+	def match_line_cursor(ruby_version, line):
+		return re.match(PROTOCOL[ruby_version]["line_regex"], line)
+
+	def match_file_cursor(ruby_version, line):
+		return re.match(PROTOCOL[ruby_version]["file_regex"], line)

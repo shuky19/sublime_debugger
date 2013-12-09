@@ -21,12 +21,19 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.client = None
 		self.control_client = None
 		self.connected = False
+		self.ruby_version = None
 
 	def start(self, current_directory, file_name, *args):
 		'''
 		Start and attach the process
 		'''
 		# Create new process
+		self.ruby_version = subprocess.Popen(["ruby", PathHelper.get_ruby_version_discoverer()], stdout=subprocess.PIPE).communicate()[0].splitlines()
+
+		if self.ruby_version[1] == "UNSUPPORTED":
+			self.log_message("Ruby version: "+self.ruby_version[0]+" is not supported.")
+			return
+
 		process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
 		process_params += args
 		self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
@@ -191,7 +198,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def split_by_results(self):
 		result = [""]
 		for line in self.get_lines():
-			if self.is_an_ending_line(line):
+			if self.debugger.match_ending(self.ruby_version, line):
 				result.insert(len(result), "")
 			else:
 				result[len(result)-1] += line + '\n'
@@ -201,14 +208,10 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def has_end_stream(self):
 		end_of_stream = False
 		for line in self.get_lines():
-				if self.is_an_ending_line:
+				if self.debugger.match_ending(self.ruby_version, line):
 					end_of_stream = True;
 
 		return end_of_stream
-
-	def is_an_ending_line(self, line):
-		# return re.match(r"PROMPT \(rdb:\d+\) ", line)
-		return re.match(r"PROMPT \(byebug\) ", line)
 
 	def get_current_position(self):
 		current_line = -1
@@ -216,12 +219,12 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = re.match(r"^=>\s+?(\d+): .*$", line)
+			match = self.debugger.match_line_cursor(self.ruby_version, line)
 
 			if match:
 				current_line = match.groups()[0]
 
-			match = re.match(r"\[-*\d+, \d+\] in (.*)$", line)
+			match = self.debugger.match_file_cursor(self.ruby_version, line)
 			if match:
 				current_file = match.groups()[0]
 
