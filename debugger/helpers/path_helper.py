@@ -35,3 +35,6 @@ class PathHelper(object):
 
 	def get_sublime_require():
 		return os.path.join(sublime.packages_path(), "Ruby Debugger", "sublime_debug_require.rb")
+
+	def get_ruby_version_discoverer():
+		return os.path.join(sublime.packages_path(), "Ruby Debugger", "ruby_version_discoverer.rb")

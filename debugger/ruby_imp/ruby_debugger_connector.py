@@ -3,7 +3,6 @@ import sublime
 import time
 import traceback
 import socket
-import re
 import subprocess
 from io import StringIO
 from threading import Thread
@@ -21,12 +20,21 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.client = None
 		self.control_client = None
 		self.connected = False
+		self.ruby_version = None
 
 	def start(self, current_directory, file_name, *args):
 		'''
 		Start and attach the process
 		'''
 		# Create new process
+		self.ruby_version = subprocess.Popen(["ruby", PathHelper.get_ruby_version_discoverer()], stdout=subprocess.PIPE).communicate()[0].splitlines()
+		self.ruby_version[0] = self.ruby_version[0].decode("UTF-8")
+		self.ruby_version[1] = self.ruby_version[1].decode("UTF-8")
+
+		if self.ruby_version[1] == "UNSUPPORTED":
+			self.log_message("Ruby version: "+self.ruby_version[0]+" is not supported.")
+			return
+
 		process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
 		process_params += args
 		self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
@@ -37,7 +45,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 		self.connected = False
 		self.log_message("Connecting... ")
-		for i in range(1,5):
+		for i in range(1,9):
 			try:
 				self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self.client.connect(("localhost", 8989))
@@ -52,7 +60,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.reader.start()
 				break
 			except Exception as ex:
-				if i == 4:
+				if i == 8:
 					self.log_message("Connection could not be made: "+str(ex)+'\n')
 				else:
 					time.sleep(1)
@@ -93,6 +101,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				result = str(bytes, "UTF-8")
 				self.data.write(result)
 				self.data.flush()
+				# self.log_message(result)
 
 				if self.has_end_stream():
 					self.handle_response()
@@ -121,6 +130,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			# Check wheather position was updated
 			if file_name != "" and not PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
 				self.debugger.signal_position_changed(file_name, line_number)
+				# self.log_message("New position: "+file_name+":"+str(line_number))
 
 			try:
 				request = self.requests.get_nowait()
@@ -189,7 +199,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def split_by_results(self):
 		result = [""]
 		for line in self.get_lines():
-			if self.is_an_ending_line(line):
+			if self.debugger.match_ending(self.ruby_version[0], line):
 				result.insert(len(result), "")
 			else:
 				result[len(result)-1] += line + '\n'
@@ -199,13 +209,10 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def has_end_stream(self):
 		end_of_stream = False
 		for line in self.get_lines():
-				if self.is_an_ending_line:
+				if self.debugger.match_ending(self.ruby_version[0], line):
 					end_of_stream = True;
 
 		return end_of_stream
-
-	def is_an_ending_line(self, line):
-		return re.match(r"PROMPT \(rdb:\d+\) ", line)
 
 	def get_current_position(self):
 		current_line = -1
@@ -213,12 +220,12 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = re.match(r"^=> (\d+) .*$", line)
+			match = self.debugger.match_line_cursor(self.ruby_version[0], line)
 
 			if match:
 				current_line = match.groups()[0]
 
-			match = re.match(r"\[-*\d+, \d+\] in (.*)$", line)
+			match = self.debugger.match_file_cursor(self.ruby_version[0], line)
 			if match:
 				current_file = match.groups()[0]
 

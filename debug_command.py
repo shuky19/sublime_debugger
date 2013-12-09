@@ -103,8 +103,9 @@ class DebugCommand(sublime_plugin.WindowCommand):
 
 	def register_breakpoints(self):
 		self.debugger.run_command(DebuggerModel.COMMAND_CLEAR_BREAKPOINTS)
+		ViewHelper.sync_breakpoints(self.window)
 
-		for file_name, line_number, condition in self.debugger_model.get_all_breakpoints(	):
+		for file_name, line_number, condition in self.debugger_model.get_all_breakpoints():
 			if condition:
 				condition = " if "+condition
 			else:

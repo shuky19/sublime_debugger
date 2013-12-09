@@ -16,6 +16,9 @@ class ToggleBreakpointCommand(sublime_plugin.TextCommand):
 			self.update_breakpoints()
 		elif mode == "conditional":
 			self.view.window().show_input_panel("Enter condition", '', lambda condition : self.update_breakpoints(condition), None, None)
+		elif mode == "refresh":
+			self.view.erase_regions("breakpoint")
+			self.update_regions(self.view.file_name(), [], "")
 
 	def update_breakpoints(self, condition=None):
 		self.view.erase_regions("breakpoint")
