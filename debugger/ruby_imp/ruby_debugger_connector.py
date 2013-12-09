@@ -35,9 +35,15 @@ class RubyDebuggerConnector(DebuggerConnector):
 			self.log_message("Ruby version: "+self.ruby_version[0]+" is not supported.")
 			return
 
-		process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
-		process_params += args
-		self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
+		if os.name == "posix":
+			process_params = "exec ruby '-C"+current_directory+"' '-r"+PathHelper.get_sublime_require()+"' '"+ file_name+"' "
+			process_params += " ".join(args)
+			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True)
+		else:
+			process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
+			process_params += args
+			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
+
 		self.data = StringIO()
 
 		self.requests = Queue()
@@ -236,6 +242,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 	def stop(self):
 		self.connected = False
+		self.log_message("Stopping...")
 		self.send_control_command("kill")
 		if self.process:
 			self.process.kill()
