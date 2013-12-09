@@ -34,7 +34,7 @@ class PathHelper(object):
 		return path.abspath(first) == path.abspath(second)
 
 	def get_sublime_require():
-		return os.path.join(sublime.packages_path(), "RubyDebugger", "sublime_debug_require.rb")
+		return os.path.join(sublime.packages_path(), "Ruby Debugger", "sublime_debug_require.rb")
 
 	def get_ruby_version_discoverer():
-		return os.path.join(sublime.packages_path(), "RubyDebugger", "ruby_version_discoverer.rb")
+		return os.path.join(sublime.packages_path(), "Ruby Debugger", "ruby_version_discoverer.rb")

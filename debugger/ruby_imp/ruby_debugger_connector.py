@@ -3,7 +3,6 @@ import sublime
 import time
 import traceback
 import socket
-import re
 import subprocess
 from io import StringIO
 from threading import Thread
@@ -29,6 +28,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 		'''
 		# Create new process
 		self.ruby_version = subprocess.Popen(["ruby", PathHelper.get_ruby_version_discoverer()], stdout=subprocess.PIPE).communicate()[0].splitlines()
+		self.ruby_version[0] = self.ruby_version[0].decode("UTF-8")
+		self.ruby_version[1] = self.ruby_version[1].decode("UTF-8")
 
 		if self.ruby_version[1] == "UNSUPPORTED":
 			self.log_message("Ruby version: "+self.ruby_version[0]+" is not supported.")
@@ -129,7 +130,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			# Check wheather position was updated
 			if file_name != "" and not PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
 				self.debugger.signal_position_changed(file_name, line_number)
-				self.log_message("New position: "+file_name+":"+str(line_number))
+				# self.log_message("New position: "+file_name+":"+str(line_number))
 
 			try:
 				request = self.requests.get_nowait()
@@ -198,7 +199,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def split_by_results(self):
 		result = [""]
 		for line in self.get_lines():
-			if self.debugger.match_ending(self.ruby_version, line):
+			if self.debugger.match_ending(self.ruby_version[0], line):
 				result.insert(len(result), "")
 			else:
 				result[len(result)-1] += line + '\n'
@@ -208,7 +209,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def has_end_stream(self):
 		end_of_stream = False
 		for line in self.get_lines():
-				if self.debugger.match_ending(self.ruby_version, line):
+				if self.debugger.match_ending(self.ruby_version[0], line):
 					end_of_stream = True;
 
 		return end_of_stream
@@ -219,12 +220,12 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = self.debugger.match_line_cursor(self.ruby_version, line)
+			match = self.debugger.match_line_cursor(self.ruby_version[0], line)
 
 			if match:
 				current_line = match.groups()[0]
 
-			match = self.debugger.match_file_cursor(self.ruby_version, line)
+			match = self.debugger.match_file_cursor(self.ruby_version[0], line)
 			if match:
 				current_file = match.groups()[0]
 
