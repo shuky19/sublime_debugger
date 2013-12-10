@@ -74,16 +74,31 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 
 ## Installation
 
+### Gem dependencies
+#### Ruby 1.9.3
+    Run command ```git install debugger```
+
+#### Ruby 2.0.0
+    Run the listed commands:
+
+      ```git clone https://github.com/shuky19/byebug <temp location>```
+      ```cd <temp location>```
+      ```gem build byebug.gemspec```
+      ```gem install byebug-2.4.2.gem```
+
+### Sublime Ruby Debugger
+
 #### [Package Control](https://sublime.wbond.net/)
 Execute __"Package Control: Install Package"__ in the Command Pallette to retrieve a list of available packages.
 Search in the list and install package `Ruby Debugger`.
 
 #### Git
 Clone the repository by executing the following command in your Packages directory:
-```git clone https://github.com/shuky19/sublime_debugger.git "RubyDebugger"```
+```git clone https://github.com/shuky19/sublime_debugger.git "Ruby Debugger"```
 
 #### Download
-Get the latest [source from GitHub](https://github.com/shuky19/sublime_debugger/archive/master.zip) and extract the source into your Packages directory.
+Get the latest [source from GitHub](https://github.com/shuky19/sublime_debugger/archive/master.zip) and extract the source into your Packages directory
+to a folder named "Ruby Debugger".
 
 
 *__Note:__ You can locate your Packages directory in the menu under* `Preferences / Browse Packages...`

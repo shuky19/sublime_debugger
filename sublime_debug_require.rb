@@ -1,22 +1,30 @@
 class RubyVersion
-  attr_accessor :version, :gem_name, :init_block, :debug_block
+  attr_accessor :version, :gem_name, :init_block, :debug_block, :gem_version
 
-  def initialize(version, gem_name, debug_block, init_block)
+  def initialize(version, gem_name, debug_block, init_block, gem_version = nil)
     self.version =version
     self.gem_name = gem_name
     self.init_block = init_block
     self.debug_block = debug_block
+    self.gem_version = gem_version
   end
 end
 
 r193 = RubyVersion.new("1.9.3", "debugger", lambda { debugger  }, lambda {  Debugger.wait_connection = true; Debugger.start_remote "127.0.0.1" })
-r200 = RubyVersion.new("2.0.0", "byebug", lambda { byebug  }, lambda {  Byebug.wait_connection = true; Byebug.start_server "127.0.0.1" })
+r200 = RubyVersion.new("2.0.0", "byebug", lambda { byebug  }, lambda {  Byebug.wait_connection = true; Byebug.start_server "127.0.0.1" }, "2.4.2")
 
 versions = {r193.version => r193, r200.version => r200 }
 
 if current_version = versions[RUBY_VERSION]
   begin
     require current_version.gem_name
+
+    if Gem::Specification.find { |g| g.name == current_version.gem_name}.version.to_s != current_version.gem_version
+      puts "#{current_version.gem_name} version is not supported,"
+      puts "please look for installation instructions on ruby version <#{RUBY_VERSION}> here:"
+      puts "https://github.com/shuky19/sublime_debugger"
+      exit
+    end
 
     current_version.init_block.call
 
