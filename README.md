@@ -1,5 +1,5 @@
 # SublimeRubyDebugger
-debugger plugin for interactive ruby and RoR debugging onSublime Text.
+debugger plugin for interactive ruby and RoR debugging on Sublime Text.
 
 ![SublimeRubyDebugger](http://i.imgur.com/PwjudlY.png)
 
