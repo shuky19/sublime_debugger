@@ -83,8 +83,11 @@ Run command ```git install debugger```
 Run the listed commands:
 
 ```git clone https://github.com/shuky19/byebug <temp location>```
+
 ```cd <temp location>```
+
 ```gem build byebug.gemspec```
+
 ```gem install byebug-2.4.2.gem```
 
 ### Sublime Ruby Debugger
