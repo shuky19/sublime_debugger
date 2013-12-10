@@ -19,7 +19,7 @@ if current_version = versions[RUBY_VERSION]
   begin
     require current_version.gem_name
 
-    if Gem::Specification.find { |g| g.name == current_version.gem_name}.version.to_s != current_version.gem_version
+    if current_version.gem_version and  Gem::Specification.find { |g| g.name == current_version.gem_name}.version.to_s != current_version.gem_version
       puts "#{current_version.gem_name} version is not supported,"
       puts "please look for installation instructions on ruby version <#{RUBY_VERSION}> here:"
       puts "https://github.com/shuky19/sublime_debugger"
