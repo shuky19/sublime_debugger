@@ -77,7 +77,7 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 
 ### Gem dependencies
 #### Ruby 1.9.3
-Run command ```git install debugger```
+Run command ```gem install debugger```
 
 #### Ruby 2.0.0
 Run the listed commands:
