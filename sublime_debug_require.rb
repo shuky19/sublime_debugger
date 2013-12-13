@@ -19,7 +19,7 @@ if current_version = versions[RUBY_VERSION]
   begin
     require current_version.gem_name
 
-    if current_version.gem_version and  Gem::Specification.find { |g| g.name == current_version.gem_name}.version.to_s != current_version.gem_version
+    if current_version.gem_version and  Gem::Specification.find_by_name(current_version.gem_name).version.to_s != current_version.gem_version
       puts "#{current_version.gem_name} version is not supported,"
       puts "please look for installation instructions on ruby version <#{RUBY_VERSION}> here:"
       puts "https://github.com/shuky19/sublime_debugger"
@@ -40,7 +40,8 @@ if current_version = versions[RUBY_VERSION]
     current_version.debug_block.call
   rescue LoadError
     puts "#{current_version.gem_name.capitalize} gem is not installed for ruby version: #{RUBY_VERSION}"
-    puts "please run 'gem install #{current_version.gem_name}' while using your default ruby version"
+    puts "please look for installation instructions here:"
+    puts "https://github.com/shuky19/sublime_debugger"
     exit
   rescue Errno::EADDRINUSE
     puts "Another process is using the debugging ports (8989,8990)"
