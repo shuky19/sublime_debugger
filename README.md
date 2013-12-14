@@ -80,15 +80,7 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 Run command ```gem install debugger```
 
 #### Ruby 2.0.0
-Run the listed commands:
-
-```git clone https://github.com/shuky19/byebug <temp location>```
-
-```cd <temp location>```
-
-```gem build byebug.gemspec```
-
-```gem install byebug-2.4.2.gem```
+Run command ```gem install byebug --version'>=2.5.0'```
 
 ### Sublime Ruby Debugger
 
