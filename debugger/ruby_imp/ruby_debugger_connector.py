@@ -26,26 +26,53 @@ class RubyDebuggerConnector(DebuggerConnector):
 		'''
 		Start and attach the process
 		'''
-		# Create new process
-		self.ruby_version = subprocess.Popen(["ruby", PathHelper.get_ruby_version_discoverer()], stdout=subprocess.PIPE).communicate()[0].splitlines()
+		# Vaildate ruby versions and gem version
+		if not self.validation_environment():
+			return
+
+		# Start the debuggee process
+		self.start_process(current_directory, file_name, args)
+
+		# Try to connect to process with sockets
+		if not self.connect_debugger():
+			return
+
+		# Start read from socket, output, errors
+		self.errors_reader = self.start_tread(lambda stream = self.process.stderr: self.output_thread(stream))
+		self.outputer = self.start_tread(lambda stream = self.process.stdout: self.output_thread(stream))
+		self.reader = self.start_tread(self.reader_thread)
+
+	def validation_environment(self):
+		try:
+			self.ruby_version = subprocess.Popen(["ruby", PathHelper.get_ruby_version_discoverer()], stdout=subprocess.PIPE).communicate()[0].splitlines()
+		except Exception:
+			self.log_message("Connection could not start process: "+str(ex)+'\n')
+			return False
+
 		self.ruby_version[0] = self.ruby_version[0].decode("UTF-8")
 		self.ruby_version[1] = self.ruby_version[1].decode("UTF-8")
 
 		if self.ruby_version[1] == "UNSUPPORTED":
 			self.log_message("Ruby version: "+self.ruby_version[0]+" is not supported.")
-			return
+			return False
 
+		return True
+
+	def start_process(self, current_directory, file_name, args):
+		# Initialize params acourding to OS type
 		if os.name == "posix":
+			# On Unix using exec and shell to get environemnt variables of ruby version
 			process_params = "exec ruby '-C"+current_directory+"' '-r"+PathHelper.get_sublime_require()+"' '"+ file_name+"' "
 			process_params += " ".join(args)
 			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True)
 		else:
+			# On Windows not using shell, so the proces is not visible to the user
 			process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
 			process_params += args
 			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
 
+	def connect_debugger(self):
 		self.data = StringIO()
-
 		self.requests = Queue()
 		self.requests.put({"signal":False, "reason":"get_location"})
 
@@ -59,27 +86,21 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.control_client.connect(("localhost", 8990))
 				self.connected = True
 				self.log_message("Connected"+'\n')
-
-				# Start reader thread
-				self.reader = Thread(target=self.reader_thread)
-				self.reader.daemon = True
-				self.reader.start()
 				break
 			except Exception as ex:
 				if i == 8:
 					self.log_message("Connection could not be made: "+str(ex)+'\n')
+					return False
 				else:
 					time.sleep(1)
 
-		# Start output thread
-		self.outputer = Thread(target=lambda stream = self.process.stderr: self.output_thread(stream))
-		self.outputer.daemon = True
-		self.outputer.start()
+		return True
 
-		# Start errors thread
-		self.outputer = Thread(target=lambda stream = self.process.stdout: self.output_thread(stream))
-		self.outputer.daemon = True
-		self.outputer.start()
+	def start_tread(self, threads_method):
+		thread  = Thread(target=threads_method)
+		thread.daemon = True
+		thread.start()
+		return thread
 
 	def output_thread(self, stream):
 		# Always read stream`
@@ -118,6 +139,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.connected = False
 
 		self.outputer.join()
+		self.errors_reader.join()
 
 		# Signal that the process has exited
 		self.log_message("Debugger stopped")
