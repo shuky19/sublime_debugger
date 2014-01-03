@@ -39,9 +39,9 @@ class RubyDebugger(Debugger):
 				 DebuggerModel.COMMAND_CONTINUTE:RubyDebugCommand("c", "continue"),
 				 DebuggerModel.COMMAND_JUMP:RubyDebugCommand("jump", "jump") }
 
-	def __init__(self, debugger_view):
+	def __init__(self, debugger_view, use_bundler):
 		super(RubyDebugger, self).__init__(debugger_view)
-		self.connector = RubyDebuggerConnector(self)
+		self.connector = RubyDebuggerConnector(self, use_bundler)
 
 	def run_command(self, command_type, *args):
 		RubyDebugger.COMMANDS[command_type].execute(self.connector, *args)

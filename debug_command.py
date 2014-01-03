@@ -57,7 +57,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.window.show_input_panel("Enter watch expression", '', lambda exp: self.on_watch_entered(exp), None, None)
 		# Start command
 		elif command == DebuggerModel.COMMAND_START_RAILS:
-			self.start_command("script/rails s")
+			self.start_command("script/rails s", True)
 		elif command == DebuggerModel.COMMAND_START_CURRENT_FILE:
 			self.start_command(self.window.active_view().file_name())
 		elif command == DebuggerModel.COMMAND_START:
@@ -69,20 +69,20 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		else:
 			self.debugger.run_command(command)
 
-	def start_command(self, file_name):
+	def start_command(self, file_name, use_bundler=False):
 		is_legal, file_path, arguments = PathHelper.get_file(file_name, self.window)
 
 		if is_legal:
-			sublime.set_timeout_async(lambda file_path=file_path, args=arguments: self.start_command_async(file_path, *args), 0)
+			sublime.set_timeout_async(lambda file_path=file_path,bundle=use_bundler, args=arguments: self.start_command_async(file_path, bundle, *args), 0)
 		else:
 			sublime.message_dialog("File: " + file_path+" does not exists")
 
-	def start_command_async(self, file_path, *args):
+	def start_command_async(self, file_path, use_bundler, *args):
 		if self.debugger:
 			self.debugger.run_command(DebuggerModel.COMMAND_STOP)
 
 		# Initialize variables
-		self.debugger = RubyDebugger(self)
+		self.debugger = RubyDebugger(self, use_bundler)
 		self.debugger_model = DebuggerModel(self.debugger)
 
 		# Intialize debugger layout
