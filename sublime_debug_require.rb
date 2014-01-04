@@ -37,10 +37,14 @@ if current_version = versions[RUBY_VERSION]
     }
 
     current_version.debug_block.call
+
   rescue LoadError
     puts "#{current_version.gem_name.capitalize} gem is not installed for ruby version: #{RUBY_VERSION}"
     puts "please look for installation instructions here:"
     puts "https://github.com/shuky19/sublime_debugger"
+    puts "Last exception: #{$!.inspect}"
+    puts "Backtrace: "
+    puts "#{$@}"
     exit
   rescue Errno::EADDRINUSE
     puts "Another process is using the debugging ports (8989,8990)"
