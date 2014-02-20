@@ -3,6 +3,17 @@ import os
 from os import path
 
 class PathHelper(object):
+	def file_exists(file_name, window):
+		is_legal = False
+		
+		if path.isfile(file_name):
+			is_legal = True
+		elif path.isfile(path.join(window.folders()[0], file_name)):
+			file_name = path.join(window.folders()[0], file_name)
+			is_legal = True
+
+		return is_legal
+
 	def get_file(command, window):
 		is_legal = False
 		file_name = ""
@@ -19,6 +30,7 @@ class PathHelper(object):
 			else:
 				file_name = " ".join([file_name,part])
 
+			# I tried to DRY here by just using the function file_exists but that somehow broke everything.
 			if path.isfile(file_name):
 				is_legal = True
 			elif path.isfile(path.join(window.folders()[0], file_name)):
