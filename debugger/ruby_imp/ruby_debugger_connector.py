@@ -13,7 +13,7 @@ from ..helpers import *
 
 class RubyDebuggerConnector(DebuggerConnector):
 	"""Connector used to communication with debugged process"""
-	def __init__(self, debugger):
+	def __init__(self, debugger, use_bundler):
 		super(RubyDebuggerConnector, self).__init__(debugger)
 		self.debugger = debugger
 		self.process = None
@@ -21,6 +21,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.control_client = None
 		self.connected = False
 		self.ruby_version = None
+		self.use_bundler = use_bundler
 
 	def start(self, current_directory, file_name, *args):
 		'''
@@ -44,9 +45,17 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 	def validation_environment(self):
 		try:
-			self.ruby_version = subprocess.Popen(["ruby", PathHelper.get_ruby_version_discoverer()], stdout=subprocess.PIPE).communicate()[0].splitlines()
-		except Exception:
-			self.log_message("Connection could not start process: "+str(ex)+'\n')
+			if os.name == "posix":
+				# On Unix using rvm and bash
+				rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\""
+				validate_command = rvm_load + " && exec ruby '" + PathHelper.get_ruby_version_discoverer()+"'"
+				self.ruby_version = subprocess.Popen(["bash", "-c", validate_command], stdout=subprocess.PIPE).communicate()[0].splitlines()
+			else:
+				# On Windows not using shell, so the proces is not visible to the user
+				process_params = ["ruby", PathHelper.get_ruby_version_discoverer()]
+				self.ruby_version = subprocess.Popen(process_params, stdout=subprocess.PIPE).communicate()[0].splitlines()
+		except Exception as ex:
+			self.log_message("Could not start process: "+str(ex)+'\n')
 			return False
 
 		self.ruby_version[0] = self.ruby_version[0].decode("UTF-8")
@@ -59,12 +68,22 @@ class RubyDebuggerConnector(DebuggerConnector):
 		return True
 
 	def start_process(self, current_directory, file_name, args):
+		requires = " '-r"+PathHelper.get_sublime_require()+"'"
+		directory = " '-C"+current_directory+"'"
+		program = " '"+file_name+"' "+" ".join(args)
+
+		# Case of running rails
+		if self.use_bundler:
+				requires = " '-rbundler/setup'" + requires
+				directory = " '-C"+sublime.active_window().folders()[0]+"'"
+
 		# Initialize params acourding to OS type
 		if os.name == "posix":
 			# On Unix using exec and shell to get environemnt variables of ruby version
-			process_params = "exec ruby '-C"+current_directory+"' '-r"+PathHelper.get_sublime_require()+"' '"+ file_name+"' "
-			process_params += " ".join(args)
-			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True)
+			rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\""
+			process_command = rvm_load + " && exec ruby"+directory+requires+program
+			process_params = ["bash", "-c", "\""+process_command+"\""]
+			self.process = subprocess.Popen(" ".join(process_params), stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=sublime.active_window().folders()[0])
 		else:
 			# On Windows not using shell, so the proces is not visible to the user
 			process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
@@ -198,7 +217,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 	def send_control_command(self, command):
 		if not self.connected:
-			return
+			pass
 
 		try:
 			self.control_client.sendall(bytes(command+'\n', 'UTF-8'))
