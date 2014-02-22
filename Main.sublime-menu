@@ -18,7 +18,7 @@
 					{
 						"caption": "Debugger: Start debugging rails",
 						"command": "debug",
-						"args": {"command":"start_debug_current_file"}
+						"args": {"command":"start_rails"}
 					},
 					{
 						"caption": "Debugger: Start debugging (Current file)",
