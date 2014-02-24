@@ -36,7 +36,6 @@ is to [install](#installation) Debugger plugin and press on
 * Linux, Window, OSX support
 
 ## Soon
-* MRI 2.0 support
 * Sublime 2 support
 * Edit and remove watch expressions
 
