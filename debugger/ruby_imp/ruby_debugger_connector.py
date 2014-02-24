@@ -47,8 +47,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 		try:
 			if os.name == "posix":
 				# On Unix using rvm and bash
-				rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\""
-				validate_command = rvm_load + " && exec ruby '" + PathHelper.get_ruby_version_discoverer()+"'"
+				rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] 2> /dev/null ; source \"$HOME/.rvm/scripts/rvm\" 2> /dev/null"
+				validate_command = rvm_load + " ; exec ruby '" + PathHelper.get_ruby_version_discoverer()+"'"
 				self.ruby_version = subprocess.Popen(["bash", "-c", validate_command], stdout=subprocess.PIPE).communicate()[0].splitlines()
 			else:
 				# On Windows not using shell, so the proces is not visible to the user
@@ -80,8 +80,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 		# Initialize params acourding to OS type
 		if os.name == "posix":
 			# On Unix using exec and shell to get environemnt variables of ruby version
-			rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\""
-			process_command = rvm_load + " && exec ruby"+directory+requires+program
+			rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] 2> /dev/null; source \"$HOME/.rvm/scripts/rvm\" 2> /dev/null"
+			process_command = rvm_load + " ; exec ruby"+directory+requires+program
 			process_params = ["bash", "-c", "\""+process_command+"\""]
 			self.process = subprocess.Popen(" ".join(process_params), stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=sublime.active_window().folders()[0])
 		else:
