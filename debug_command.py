@@ -125,7 +125,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 
 	def on_expression_entered(self, expression):
 		self.debugger.run_result_command(DebuggerModel.COMMAND_GET_EXPRESSION, expression, expression)
-		ViewHelper.move_to_front(self.window, self.debug_views[DebuggerModel.DATA_IMMIDIATE])
+		ViewHelper.move_to_front(self.window, self.debug_views[DebuggerModel.DATA_IMMEDIATE])
 
 	def on_watch_entered(self, expression):
 		self.debugger_model.add_watch(expression)

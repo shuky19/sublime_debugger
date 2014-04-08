@@ -3,7 +3,7 @@ class DebuggerModel(object):
 
 	# Debugging data types
 	DATA_WATCH = "Watch"
-	DATA_IMMIDIATE = "Immidiate"
+	DATA_IMMEDIATE = "Immediate"
 	DATA_OUTPUT = "Output"
 	DATA_BREAKPOINTS = "Breakpoints"
 	DATA_LOCALS = "Locals"
@@ -48,7 +48,7 @@ class DebuggerModel(object):
 
 	REFRESHABLE_COMMANDS = [COMMAND_GET_THREADS, COMMAND_GET_STACKTRACE, COMMAND_GET_LOCALS, COMMAND_GET_BREAKPOINTS]
 
-	APPENDABLE_DATA = [DATA_IMMIDIATE, DATA_OUTPUT]
+	APPENDABLE_DATA = [DATA_IMMEDIATE, DATA_OUTPUT]
 
 	STARTERS_COMMANDS = [COMMAND_DEBUG_LAYOUT, COMMAND_RESET_LAYOUT, COMMAND_START_RAILS, COMMAND_START, COMMAND_START_CURRENT_FILE]
 	COMMANDS = [COMMAND_DEBUG_LAYOUT, COMMAND_RESET_LAYOUT, COMMAND_START_RAILS, COMMAND_INTERRUPT, COMMAND_START_CURRENT_FILE, COMMAND_GO_TO, COMMAND_ADD_WATCH, COMMAND_GET_WATCH, COMMAND_START, COMMAND_STOP, COMMAND_SEND_INPUT, COMMAND_STEP_OVER, COMMAND_STEP_INTO, COMMAND_STEP_UP, COMMAND_STEP_DOWN, COMMAND_CONTINUTE, COMMAND_JUMP, COMMAND_GET_LOCATION, COMMAND_GET_STACKTRACE, COMMAND_GET_LOCALS, COMMAND_GET_THREADS, COMMAND_GET_EXPRESSION, COMMAND_GET_BREAKPOINTS, COMMAND_SET_BREAKPOINT, COMMAND_CLEAR_BREAKPOINTS]
@@ -60,7 +60,7 @@ class DebuggerModel(object):
 		self.debugger = debugger
 		self.data = {}
 		self.data[DebuggerModel.DATA_WATCH] = []
-		self.data[DebuggerModel.DATA_IMMIDIATE] = ""
+		self.data[DebuggerModel.DATA_IMMEDIATE] = ""
 		self.data[DebuggerModel.DATA_OUTPUT] = ""
 		self.data[DebuggerModel.DATA_BREAKPOINTS] = ""
 		self.data[DebuggerModel.DATA_LOCALS] = ""
@@ -100,7 +100,7 @@ class DebuggerModel(object):
 		if data_type == DebuggerModel.DATA_WATCH:
 			self.update_watch_expression(new_value[0], new_value[1])
 			return self.watch_to_str(), line_to_show, should_append
-		elif data_type == DebuggerModel.DATA_IMMIDIATE:
+		elif data_type == DebuggerModel.DATA_IMMEDIATE:
 			self.data[data_type] += new_value[0]+" => "+ new_value[1] + '\n'
 			self.referesh_data()
 		elif data_type in DebuggerModel.APPENDABLE_DATA:

@@ -26,7 +26,7 @@ is to [install](#installation) Debugger plugin and press on
 ## Features
 * Local debugging Ruby and RoR applications.
 * Stepping up, down ,over and into while debugging (jumps and goto also available).
-* Add watch expression and run immidiate code using the current program context.
+* Add watch expression and run immediate code using the current program context.
 * Monitoring on stack, threads, output and local variables in the program.
 * Builtin rails support.
 * Breakpoints, conditional breakpoints and temporary breakpoints (goto) support.
