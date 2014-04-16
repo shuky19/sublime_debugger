@@ -32,7 +32,7 @@ is to [install](#installation) Debugger plugin and press on
 * Breakpoints, conditional breakpoints and temporary breakpoints (goto) support.
 * Works on Sublime Text 3 (later version will work on both 2 and 3)
 * MRI 1.9.3 support (using debugger gem).
-* MRI 2.0.0 support (using my fork for byebug gem).
+* MRI 2.0.0 support (using byebug gem).
 * Linux, Window, OSX support
 
 ## Soon
