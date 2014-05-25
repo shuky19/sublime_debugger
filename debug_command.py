@@ -1,5 +1,9 @@
 import sublime, sublime_plugin
-from .debugger import *
+
+try:
+    from .debugger import *
+except:
+    from debugger import *
 
 class DebugCommand(sublime_plugin.WindowCommand):
 	def __init__(self, window):
@@ -78,7 +82,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		is_legal, file_path, arguments = PathHelper.get_file(file_name, self.window)
 
 		if is_legal:
-			sublime.set_timeout_async(lambda file_path=file_path,bundle=use_bundler, args=arguments: self.start_command_async(file_path, bundle, *args), 0)
+			SublimeHelper.set_timeout_async(lambda file_path=file_path,bundle=use_bundler, args=arguments: self.start_command_async(file_path, bundle, *args), 0)
 		else:
 			sublime.message_dialog("File: " + file_path+" does not exists")
 

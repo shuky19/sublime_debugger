@@ -1,5 +1,9 @@
 import sublime, sublime_plugin
-from .debugger import *
+try:
+    from .debugger import *
+except:
+    from debugger import *
+
 
 class EraseAllCommand(sublime_plugin.TextCommand):
 	def run(self, edit):

@@ -3,6 +3,7 @@ import os
 from os import path
 
 class PathHelper(object):
+	@staticmethod
 	def file_exists(file_name, window):
 		is_legal = False
 		
@@ -14,6 +15,7 @@ class PathHelper(object):
 
 		return is_legal
 
+	@staticmethod
 	def get_file(command, window):
 		is_legal = False
 		file_name = ""
@@ -39,14 +41,18 @@ class PathHelper(object):
 
 		return is_legal, file_name, arguments
 
+	@staticmethod
 	def get_pwd(file_name):
 		return path.split(file_name)[0]
 
+	@staticmethod
 	def is_same_path(first, second):
 		return path.abspath(first) == path.abspath(second)
 
+	@staticmethod
 	def get_sublime_require():
 		return os.path.join(sublime.packages_path(), "Ruby Debugger", "sublime_debug_require.rb")
 
+	@staticmethod
 	def get_ruby_version_discoverer():
 		return os.path.join(sublime.packages_path(), "Ruby Debugger", "ruby_version_discoverer.rb")

@@ -3,9 +3,11 @@ from ..interfaces.debugger_model import DebuggerModel
 from .path_helper import PathHelper
 
 class ViewHelper(object):
+	@staticmethod
 	def region_in_line(region, line):
 		return line.begin() <= region.begin() and line.end() >= region.end()
 
+	@staticmethod
 	def get_lines(view, regions):
 		file_lines = view.lines(sublime.Region(0, view.size()))
 		lines = []
@@ -15,6 +17,7 @@ class ViewHelper(object):
 
 		return lines
 
+	@staticmethod
 	def init_debug_layout(window, debug_views):
 		window.set_layout({"cols" : [0,0.5,1], "rows":[0,0.7,1], "cells":[[0,0,2,1],[0,1,1,2],[1,1,2,2]]})
 
@@ -24,7 +27,7 @@ class ViewHelper(object):
 				view.set_read_only(False)
 				view.run_command("erase_all")
 				view.set_read_only(True)
-			elif view not in window.views_in_group(0):
+			elif window.get_view_index(view)[0] != 0:
 				window.set_view_index(view, 0, len(window.views_in_group(0)))
 
 		groups = [0,0]
@@ -45,6 +48,7 @@ class ViewHelper(object):
 
 		window.focus_group(0)
 
+	@staticmethod
 	def reset_debug_layout(window, debug_views):
 		for view in window.views():
 			if view.name() in debug_views.keys():
@@ -53,6 +57,7 @@ class ViewHelper(object):
 
 		window.set_layout({"cols" : [0,1], "rows":[0,1], "cells":[[0,0,1,1]]})
 
+	@staticmethod
 	def set_cursor(window, file_name, line_number):
 		view = window.open_file(file_name)
 		while view.is_loading():
@@ -63,12 +68,14 @@ class ViewHelper(object):
 		if view not in window.views_in_group(0):
 			window.set_view_index(view, 0, len(window.views_in_group(0)))
 
+	@staticmethod
 	def replace_content(window, view, new_content, line_to_show, should_append):
 		view.set_read_only(False)
 		if not should_append:
 			view.run_command('erase_all')
 
-		view.run_command('append', {'characters': new_content})
+		view.run_command("move_to", {"to": "eof"})
+		view.run_command('insert', {'characters': new_content})
 		view.set_read_only(True)
 		if not line_to_show:
 			line_to_show = len(view.lines(sublime.Region(0, view.size())))
@@ -77,6 +84,7 @@ class ViewHelper(object):
 		if view.name() not in DebuggerModel.REFRESHABLE_DATA:
 			ViewHelper.move_to_front(window, view)
 
+	@staticmethod
 	def get_current_cursor(window, file_name):
 		for view in window.views():
 			if PathHelper.is_same_path(view.file_name(), file_name):
@@ -84,6 +92,7 @@ class ViewHelper(object):
 
 		return None
 
+	@staticmethod
 	def move_to_front(window, debug_view):
 		current_active = window.active_view()
 		active_group = window.views_in_group(window.active_group())
@@ -95,6 +104,7 @@ class ViewHelper(object):
 					if debug_view not in active_group:
 						window.focus_view(current_active)
 
+	@staticmethod
 	def sync_breakpoints(window):
 		for view in window.views():
 			view.run_command("toggle_breakpoint", {"mode":"refresh"})

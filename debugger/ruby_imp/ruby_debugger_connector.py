@@ -4,10 +4,16 @@ import time
 import traceback
 import socket
 import subprocess
-from io import StringIO
+
 from threading import Thread
-import queue
-from queue import Queue
+try:
+	import queue
+	from queue import Queue
+	from io import StringIO
+except:
+    from Queue import Queue
+    from StringIO import StringIO
+
 from ..interfaces import *
 from ..helpers import *
 
@@ -130,7 +136,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				if len(bytes) == 0:
 					break
 
-				result = str(bytes, "UTF-8")
+				result = bytes.decode("UTF-8")
 				self.log_message(result)
 		except Exception:
 			pass
@@ -144,10 +150,9 @@ class RubyDebuggerConnector(DebuggerConnector):
 				if len(bytes) == 0:
 					break
 
-				result = str(bytes, "UTF-8")
+				result = bytes.decode("UTF-8")
 				self.data.write(result)
 				self.data.flush()
-				# self.log_message(result)
 
 				if self.has_end_stream():
 					self.handle_response()
@@ -196,8 +201,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 				else:
 					pass
 
-				if PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
-					self.debugger.run_command(DebuggerModel.COMMAND_CONTINUTE)
+				# if PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
+				# 	self.debugger.run_command(DebuggerModel.COMMAND_CONTINUTE)
 			except queue.Empty:
 				pass
 
@@ -212,7 +217,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.send_data_internal(command)
 
 	def send_input(self, command):
-		self.process.stdin.write(bytes(command+'\n',"UTF-8"))
+		self.process.stdin.write(bytearray(command+'\n', "UTF-8"))
 		self.process.stdin.flush()
 
 	def send_control_command(self, command):
@@ -220,7 +225,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			pass
 
 		try:
-			self.control_client.sendall(bytes(command+'\n', 'UTF-8'))
+			self.control_client.sendall(bytearray(command+'\n', "UTF-8"))
 		except Exception as e:
 			if self.connected:
 				self.log_message("Failed communicate with process ("+command+"): "+str(e))
@@ -230,7 +235,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			return
 
 		try:
-			self.client.sendall(bytes(command+'\n', 'UTF-8'))
+			self.client.sendall(bytearray(command+'\n', "UTF-8"))
 		except Exception as e:
 			if self.connected:
 				self.log_message("Failed communicate with process ("+command+"): "+str(e))

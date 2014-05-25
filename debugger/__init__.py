@@ -3,4 +3,4 @@ from .helpers import *
 from .interfaces import *
 from .ruby_imp import *
 
-__all__ = ['PathHelper','ViewHelper','DebuggerModel','Breakpoint','RubyDebugger','RubyDebugger']
+__all__ = ['SublimeHelper', 'PathHelper','ViewHelper','DebuggerModel','Breakpoint','RubyDebugger','RubyDebugger']
