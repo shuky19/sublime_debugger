@@ -26,13 +26,13 @@ is to [install](#installation) Debugger plugin and press on
 ## Features
 * Local debugging Ruby and RoR applications.
 * Stepping up, down ,over and into while debugging (jumps and goto also available).
-* Add watch expression and run immidiate code using the current program context.
+* Add watch expression and run immediate code using the current program context.
 * Monitoring on stack, threads, output and local variables in the program.
 * Builtin rails support.
 * Breakpoints, conditional breakpoints and temporary breakpoints (goto) support.
 * Works on Sublime Text 3 (later version will work on both 2 and 3)
 * MRI 1.9.3 support (using debugger gem).
-* MRI 2.0.0 support (using my fork for byebug gem).
+* MRI 2.0.0 support (using byebug gem).
 * Linux, Window, OSX support
 
 ## Soon
