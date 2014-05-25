@@ -6,8 +6,7 @@ class SublimeHelper(object):
 	def set_timeout_async(command, delay):
 		try:
 			sublime.set_timeout_async(command, delay)
-		except Exception, e:
+		except Exception:
 			thread  = Thread(target=command)
 			thread.daemon = True
-			# # thread  = Thread(target=lambda command=command, delay=delay: sublime.set_timeout(command, delay))
 			thread.start()
