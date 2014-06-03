@@ -1,4 +1,5 @@
 import sublime, sublime_plugin
+import threading
 
 try:
     from .debugger import *
@@ -62,9 +63,9 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		# Start command
 		elif command == DebuggerModel.COMMAND_START_RAILS:
 			if PathHelper.file_exists("script/rails", self.window):
-				self.start_command("script/rails s")
+				self.start_command("script/rails s", True)
 			elif PathHelper.file_exists("bin/rails", self.window): # Rails 4 support
-				self.start_command("bin/rails s")
+				self.start_command("bin/rails s", True)
 			else:
 				sublime.message_dialog("Cannot find file. Are you sure you're in a rails project?")
 		elif command == DebuggerModel.COMMAND_START_CURRENT_FILE:
@@ -82,6 +83,8 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		is_legal, file_path, arguments = PathHelper.get_file(file_name, self.window)
 
 		if is_legal:
+			# Intialize debugger layout
+			self.show_debugger_layout()
 			SublimeHelper.set_timeout_async(lambda file_path=file_path,bundle=use_bundler, args=arguments: self.start_command_async(file_path, bundle, *args), 0)
 		else:
 			sublime.message_dialog("File: " + file_path+" does not exists")
@@ -93,9 +96,6 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		# Initialize variables
 		self.debugger = RubyDebugger(self, use_bundler)
 		self.debugger_model = DebuggerModel(self.debugger)
-
-		# Intialize debugger layout
-		self.show_debugger_layout()
 
 		# Start debugging
 		self.debugger.run_command(DebuggerModel.COMMAND_START, PathHelper.get_pwd(file_path), file_path, *args)
@@ -112,7 +112,7 @@ class DebugCommand(sublime_plugin.WindowCommand):
 
 	def register_breakpoints(self):
 		self.debugger.run_command(DebuggerModel.COMMAND_CLEAR_BREAKPOINTS)
-		ViewHelper.sync_breakpoints(self.window)
+		self.window.run_command("view_helper", {"command" : "sync_breakpoints"})
 
 		for file_name, line_number, condition in self.debugger_model.get_all_breakpoints():
 			if condition:
@@ -129,11 +129,11 @@ class DebugCommand(sublime_plugin.WindowCommand):
 
 	def on_expression_entered(self, expression):
 		self.debugger.run_result_command(DebuggerModel.COMMAND_GET_EXPRESSION, expression, expression)
-		ViewHelper.move_to_front(self.window, self.debug_views[DebuggerModel.DATA_IMMEDIATE])
+		self.window.run_command("view_helper", {"command" : "move_to_front", "debug_view" : self.debug_views[DebuggerModel.DATA_IMMEDIATE]})
 
 	def on_watch_entered(self, expression):
 		self.debugger_model.add_watch(expression)
-		ViewHelper.move_to_front(self.window, self.debug_views[DebuggerModel.DATA_WATCH])
+		self.window.run_command("view_helper", {"command" : "move_to_front", "debug_view" : self.debug_views[DebuggerModel.DATA_WATCH]})
 
 	def add_text_result(self, result, reason):
 		result = self.debugger_model.update_data(reason, result)
@@ -142,12 +142,12 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			new_data = result[0]
 			line_to_show = result[1]
 			should_append = result[2]
-			ViewHelper.replace_content(self.window, self.debug_views[reason], new_data, line_to_show, should_append)
+			self.debug_views[reason].run_command("replace_content", {"new_content" : new_data, "line_to_show" : line_to_show, "should_append" : should_append})
 
 	def set_cursor(self, file_name, line_number):
 		# Updating only if position changed
 		if self.debugger_model.set_cursor(file_name, line_number):
-			ViewHelper.set_cursor(self.window, file_name, line_number)
+			self.window.run_command("view_helper", {"command" : "set_cursor", "file_name" : file_name, "line_number" : line_number})
 
 	def clear_cursor(self):
 		for view in self.window.views():
@@ -158,5 +158,3 @@ class DebugCommand(sublime_plugin.WindowCommand):
 	def stop(self):
 		self.clear_cursor()
 		self.debugger = None
-
-		# ViewHelper.reset_debug_layout(self.window, self.debug_views)

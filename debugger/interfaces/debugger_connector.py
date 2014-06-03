@@ -15,7 +15,6 @@ class DebuggerConnector(object):
 
 	def log_message(self, message):
 		self.debugger.signal_text_result(message, DebuggerModel.DATA_OUTPUT)
-		print(message)
 
 	@abstractmethod
 	def start(self, current_directory, file_name, *args):

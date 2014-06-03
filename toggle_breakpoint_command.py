@@ -9,6 +9,11 @@ class EraseAllCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.view.erase(edit, sublime.Region(0, self.view.size()))
 
+class ReplaceContentCommand(sublime_plugin.TextCommand):
+	def run(self, edit, new_content, line_to_show, should_append):
+		print(self.view.name())
+		sublime.set_timeout(lambda view=self.view, new_content=new_content, line_to_show=line_to_show, should_append=should_append: ViewHelper.replace_content(view, new_content, line_to_show, should_append), 0)
+
 class ToggleBreakpointCommand(sublime_plugin.TextCommand):
 	def run(self, edit, mode, **args):
 		if mode == "clear_all":

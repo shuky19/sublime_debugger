@@ -9,9 +9,11 @@ from threading import Thread
 try:
 	import queue
 	from queue import Queue
+	from queue import Empty
 	from io import StringIO
 except:
     from Queue import Queue
+    from Queue import Empty
     from StringIO import StringIO
 
 from ..interfaces import *
@@ -28,6 +30,9 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.connected = False
 		self.ruby_version = None
 		self.use_bundler = use_bundler
+		self.errors_reader = None
+		self.outputer = None
+		self.reader = None
 
 	def start(self, current_directory, file_name, *args):
 		'''
@@ -180,7 +185,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 			file_name, line_number = self.get_current_position()
 
 			# Check wheather position was updated
-			if file_name != "" and not PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
+			if file_name != "" and not PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name) and not "kernel_require.rb" in file_name:
 				self.debugger.signal_position_changed(file_name, line_number)
 				# self.log_message("New position: "+file_name+":"+str(line_number))
 
@@ -201,9 +206,10 @@ class RubyDebuggerConnector(DebuggerConnector):
 				else:
 					pass
 
-				# if PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name):
-				# 	self.debugger.run_command(DebuggerModel.COMMAND_CONTINUTE)
-			except queue.Empty:
+				print(file_name)
+				if PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name) or "kernel_require.rb" in file_name:
+					self.debugger.run_command(DebuggerModel.COMMAND_STEP_OVER)
+			except Empty:
 				pass
 
 		self.data = StringIO()
@@ -221,6 +227,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.process.stdin.flush()
 
 	def send_control_command(self, command):
+		print(command)
 		if not self.connected:
 			pass
 
@@ -231,6 +238,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.log_message("Failed communicate with process ("+command+"): "+str(e))
 
 	def send_data_internal(self, command):
+		print(command)
 		if not self.connected:
 			return
 
@@ -287,9 +295,10 @@ class RubyDebuggerConnector(DebuggerConnector):
 		return self.data.getvalue().split('\n')
 
 	def stop(self):
-		self.connected = False
 		self.log_message("Stopping...")
 		self.send_control_command("kill")
 		if self.process:
 			self.process.kill()
+
+		self.connected = False
 		self.process = None
