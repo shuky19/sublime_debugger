@@ -34,9 +34,9 @@ is to [install](#installation) Debugger plugin and press on
 * MRI 1.9.3 support (using debugger gem).
 * MRI 2.0.0 support (using byebug gem).
 * Linux, Window, OSX support
+* Sublime Text 2 and 3 support
 
 ## Soon
-* Sublime 2 support
 * Edit and remove watch expressions
 
 ## Commands
@@ -104,7 +104,7 @@ to a folder named "Ruby Debugger".
 #### Why do i get on the output window "Errno::EADDRINUSE: Address already in use - bind(2)"?
 Thats because there is another process running on your OS who is using the port 8989/8990
 
-Another option is that the last debugger process is still alive
+Another option is that the last debugger process is still alive (```killall ruby``` will solve that)
 
 ## License
 
@@ -112,6 +112,7 @@ SublimeTextXdebug is released under the [MIT License](http://www.opensource.org/
 
 ## Todo
 
+* Settings file
 * Break point windows updates
 * Set view cursor on debug cursor change
 * Nice message when port is taken
