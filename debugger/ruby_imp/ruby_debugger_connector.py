@@ -206,7 +206,6 @@ class RubyDebuggerConnector(DebuggerConnector):
 				else:
 					pass
 
-				print(file_name)
 				if PathHelper.is_same_path(PathHelper.get_sublime_require(), file_name) or "kernel_require.rb" in file_name:
 					self.debugger.run_command(DebuggerModel.COMMAND_STEP_OVER)
 			except Empty:
@@ -227,7 +226,6 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.process.stdin.flush()
 
 	def send_control_command(self, command):
-		print(command)
 		if not self.connected:
 			pass
 
@@ -238,7 +236,6 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.log_message("Failed communicate with process ("+command+"): "+str(e))
 
 	def send_data_internal(self, command):
-		print(command)
 		if not self.connected:
 			return
 
