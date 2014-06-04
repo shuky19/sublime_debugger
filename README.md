@@ -30,11 +30,10 @@ is to [install](#installation) Debugger plugin and press on
 * Monitoring on stack, threads, output and local variables in the program.
 * Builtin rails support.
 * Breakpoints, conditional breakpoints and temporary breakpoints (goto) support.
-* Works on Sublime Text 3 (later version will work on both 2 and 3)
+* Works on Sublime Text 2 and 3.
 * MRI 1.9.3 support (using debugger gem).
 * MRI 2.0.0 support (using byebug gem).
 * Linux, Window, OSX support
-* Sublime Text 2 and 3 support
 
 ## Soon
 * Edit and remove watch expressions
