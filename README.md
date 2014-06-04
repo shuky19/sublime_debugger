@@ -3,7 +3,7 @@ debugger plugin for interactive ruby and RoR debugging on Sublime Text.
 
 ![SublimeRubyDebugger](http://i.imgur.com/PwjudlY.png)
 
-Based [Debugger gem](https://github.com/cldwalker/debugger) package by [Shuky chen](https://github.com/shuky19).
+By [Shuky chen](https://github.com/shuky19), Based [Debugger gem](https://github.com/cldwalker/debugger) and [Byebug gem](https://github.com/deivid-rodriguez/byebug).
 
 ## Overview
 * [First Steps](#first-steps)
