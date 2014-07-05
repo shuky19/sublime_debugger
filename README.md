@@ -1,9 +1,9 @@
-# SublimeRubyDebugger
-debugger plugin for interactive ruby and RoR debugging on Sublime Text.
+# Sublime Ruby Debugger
+A debugger plugin for interactive ruby and RoR debugging on Sublime Text.
 
 ![SublimeRubyDebugger](http://i.imgur.com/PwjudlY.png)
 
-By [Shuky chen](https://github.com/shuky19), Based [Debugger gem](https://github.com/cldwalker/debugger) and [Byebug gem](https://github.com/deivid-rodriguez/byebug).
+By [Shuky chen](https://github.com/shuky19), based on the [Debugger](https://github.com/cldwalker/debugger) and [Byebug](https://github.com/deivid-rodriguez/byebug) gems.
 
 ## Overview
 * [First Steps](#first-steps)
@@ -18,19 +18,16 @@ By [Shuky chen](https://github.com/shuky19), Based [Debugger gem](https://github
 
 
 ## First steps
-In order to start debugging ruby or RoR applications all you need to do
-
-is to [install](#installation) Debugger plugin and press on
-<kbd>F6</kbd> or <kbd>Shift+F6</kbd> or <kbd>Alt+Shift+F6</kbd>
+In order to start debugging ruby or RoR applications all you need to do is [install](#installation) the Debugger plugin and press <kbd>F6</kbd>,or <kbd>Shift+F6</kbd>,or <kbd>Alt+Shift+F6</kbd>
 
 ## Features
-* Local debugging Ruby and RoR applications.
-* Stepping up, down ,over and into while debugging (jumps and goto also available).
+* Local debugging in Ruby and RoR applications.
+* Stepping up, down, over, and into while debugging (jumps and goto also available).
 * Add watch expression and run immediate code using the current program context.
-* Monitoring on stack, threads, output and local variables in the program.
+* Monitoring on stack, threads, output, and local variables in the program.
 * Builtin rails support.
-* Breakpoints, conditional breakpoints and temporary breakpoints (goto) support.
-* Works on Sublime Text 2 and 3.
+* Breakpoints, conditional breakpoints, and temporary breakpoints (goto) support.
+* Works in Sublime Text 2 and 3.
 * MRI 1.9.3 support (using debugger gem).
 * MRI 2.0.0 support (using byebug gem).
 * Linux, Window, OSX support
@@ -56,8 +53,8 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 #### Cursor control
 * Step Over - <kbd>F10</kbd>
 * Step Into - <kbd>F11</kbd>
-* Step up -  - <kbd>Alt+d, u</kbd>
-* Step down -  - <kbd>Alt+d, d</kbd>
+* Step up - <kbd>Alt+d, u</kbd>
+* Step down - <kbd>Alt+d, d</kbd>
 * Continue - <kbd>F8</kbd>
 * Run To Line (goto) - <kbd>ctrl+F10</kbd> or <kbd>⌘+F10</kbd>
 * Jumo to line - <kbd>Ctrl+Shift+F10</kbd> or <kbd>⌘+Shift+F10</kbd>
@@ -100,10 +97,8 @@ to a folder named "Ruby Debugger".
 
 ## Troubleshoot
 
-#### Why do i get on the output window "Errno::EADDRINUSE: Address already in use - bind(2)"?
-Thats because there is another process running on your OS who is using the port 8989/8990
-
-Another option is that the last debugger process is still alive (```killall ruby``` will solve that)
+#### Why do I get ```Errno::EADDRINUSE: Address already in use - bind(2)``` in the output window?
+Either because there is another process running which is using ports 8989/8990 or the last debugger process is still alive (```killall ruby``` will solve that).
 
 ## License
 
