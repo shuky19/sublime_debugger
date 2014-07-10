@@ -71,11 +71,14 @@ Here is a complete list of commands you can find Command Pallette under the `Deb
 ## Installation
 
 ### Gem dependencies
-#### Ruby 1.9.3
-Run command ```gem install debugger```
 
-#### Ruby 2.0.0
-Run command ```gem install byebug --version '>=2.5.0'```
+Sublime Debugger relies on two seperate gems for diffirent ruby versions. For Ruby 1.9.3 you need the debugger gem, which can be installed using ```gem install debugger```, and for Ruby 2.0.0 you need the byebug gem, which can be installed using ```gem install byebug```.
+
+### Unsupported ruby versions
+
+I cannot test this against all ruby versions, so I only explicity support Ruby 1.9.3 and Ruby 2.0.0. [RVM](https://wiki.archlinux.org/index.php/RVM) is a good way to have multiple ruby versions installed at once and switch between them when debugging or running normally. Sublime Debugger will use the ruby version that you set as default, so you must set either Ruby 1.9.3 or Ruby 2.0.0 as the default. Remember to reinstall the byebug or debugger gem when you change ruby versions, or else you will get an ```Connection could not be made: [Errno ##] Connection refused``` error.
+
+If you need to have your ruby program running with an unspported ruby version you can manually add the version to the supported versions list. In the package's directory, which you can get to by going to ```preferences -> browse packages``` in sublime text and then opening the ```Ruby Debugger``` folder, there is a ```ruby_version_discoverer.rb``` file where you can add your ruby version.
 
 ### Sublime Ruby Debugger
 
