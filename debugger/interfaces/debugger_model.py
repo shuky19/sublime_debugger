@@ -107,6 +107,7 @@ class DebuggerModel(object):
 			should_append = True
 			if not new_value.endswith('\n'):
 				new_value = new_value + '\n'
+			new_value = new_value.replace("\r", "")
 			self.data[data_type] += new_value
 			return new_value, line_to_show, should_append
 		else:

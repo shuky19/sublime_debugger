@@ -64,13 +64,15 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.ruby_version = subprocess.Popen(["bash", "-c", validate_command], stdout=subprocess.PIPE).communicate()[0]
 			else:
 				# On Windows not using shell, so the proces is not visible to the user
+				startupinfo = subprocess.STARTUPINFO()
+				startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 				process_params = ["ruby", PathHelper.get_ruby_version_discoverer()]
-				self.ruby_version = subprocess.Popen(process_params, stdout=subprocess.PIPE).communicate()[0]
+				self.ruby_version = subprocess.Popen(process_params, stdout=subprocess.PIPE, startupinfo=startupinfo).communicate()[0]
 		except Exception as ex:
 			self.log_message("Could not start process: "+str(ex)+'\n')
 			return False
 
-		self.ruby_version = self.ruby_version.decode("UTF-8").replace("\n", "")
+		self.ruby_version = self.ruby_version.decode("UTF-8").replace("\n", "").replace("\r", "")
 		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
 
 		if self.ruby_version not in settings.get('supported_ruby_versions'):
@@ -105,9 +107,11 @@ class RubyDebuggerConnector(DebuggerConnector):
 					self.log_message("Started process command: " + " ".join(process_params) )
 		else:
 			# On Windows not using shell, so the proces is not visible to the user
+			startupinfo = subprocess.STARTUPINFO()
+			startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 			process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
 			process_params += args
-			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
+			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, startupinfo=startupinfo)
 
 			if self.is_debug():
 				self.log_message("Started process command: " + " ".join(process_params) )
