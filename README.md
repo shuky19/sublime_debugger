@@ -105,7 +105,7 @@ Either because there is another process running which is using ports 8989/8990 o
 
 ## License
 
-SublimeTextXdebug is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+RubyDebugger is released under the [MIT License](http://www.opensource.org/licenses/MIT).
 
 ## Todo
 
