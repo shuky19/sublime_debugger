@@ -97,6 +97,7 @@ class ViewHelper(object):
 			view.run_command('erase_all')
 
 		view.run_command("move_to", {"to": "eof"})
+		view.run_command("move_to", {"to": "bol"})
 		view.run_command('insert', {'characters': new_content})
 		view.set_read_only(True)
 		if not line_to_show:

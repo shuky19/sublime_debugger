@@ -45,13 +45,14 @@ class RubyDebuggerConnector(DebuggerConnector):
 		# Start the debuggee process
 		self.start_process(current_directory, file_name, args)
 
+		# Start read from socket, output, errors
+		self.errors_reader = self.start_tread(lambda stream = self.process.stderr: self.output_thread(stream))
+		self.outputer = self.start_tread(lambda stream = self.process.stdout: self.output_thread(stream))
+
 		# Try to connect to process with sockets
 		if not self.connect_debugger():
 			return
 
-		# Start read from socket, output, errors
-		self.errors_reader = self.start_tread(lambda stream = self.process.stderr: self.output_thread(stream))
-		self.outputer = self.start_tread(lambda stream = self.process.stdout: self.output_thread(stream))
 		self.reader = self.start_tread(self.reader_thread)
 
 	def validation_environment(self):
@@ -60,46 +61,56 @@ class RubyDebuggerConnector(DebuggerConnector):
 				# On Unix using rvm and bash
 				rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] 2> /dev/null ; source \"$HOME/.rvm/scripts/rvm\" 2> /dev/null"
 				validate_command = rvm_load + " ; exec ruby '" + PathHelper.get_ruby_version_discoverer()+"'"
-				self.ruby_version = subprocess.Popen(["bash", "-c", validate_command], stdout=subprocess.PIPE).communicate()[0].splitlines()
+				self.ruby_version = subprocess.Popen(["bash", "-c", validate_command], stdout=subprocess.PIPE).communicate()[0]
 			else:
 				# On Windows not using shell, so the proces is not visible to the user
 				process_params = ["ruby", PathHelper.get_ruby_version_discoverer()]
-				self.ruby_version = subprocess.Popen(process_params, stdout=subprocess.PIPE).communicate()[0].splitlines()
+				self.ruby_version = subprocess.Popen(process_params, stdout=subprocess.PIPE).communicate()[0]
 		except Exception as ex:
 			self.log_message("Could not start process: "+str(ex)+'\n')
 			return False
 
-		self.ruby_version[0] = self.ruby_version[0].decode("UTF-8")
-		self.ruby_version[1] = self.ruby_version[1].decode("UTF-8")
+		self.ruby_version = self.ruby_version.decode("UTF-8").replace("\n", "")
+		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
 
-		if self.ruby_version[1] == "UNSUPPORTED":
-			self.log_message("Ruby version: "+self.ruby_version[0]+" is not supported.")
+		if self.ruby_version not in settings.get('supported_ruby_versions'):
+			self.log_message("Ruby version: "+self.ruby_version+" is not supported.")
 			return False
 
 		return True
 
 	def start_process(self, current_directory, file_name, args):
+		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
 		requires = " '-r"+PathHelper.get_sublime_require()+"'"
 		directory = " '-C"+current_directory+"'"
 		program = " '"+file_name+"' "+" ".join(args)
 
 		# Case of running rails
-		if self.use_bundler:
+		if self.use_bundler or settings.get('should_use_bundle'):
 				requires = " '-rbundler/setup'" + requires
 				directory = " '-C"+sublime.active_window().folders()[0]+"'"
 
 		# Initialize params acourding to OS type
 		if os.name == "posix":
+			ruby_binaries = "'"+settings.get("ruby_binaries")+"'"
+			debug_logs_enabled = str(settings.get("debug_logs"))
+			ruby_arguments = directory + requires+" "+settings.get("ruby_arguments")+" "+program
+
 			# On Unix using exec and shell to get environemnt variables of ruby version
-			rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] 2> /dev/null; source \"$HOME/.rvm/scripts/rvm\" 2> /dev/null"
-			process_command = rvm_load + " ; exec ruby"+directory+requires+program
+			process_command = "'"+PathHelper.get_ruby_executor()+"' " + ruby_binaries + " " + debug_logs_enabled + " " + ruby_arguments
 			process_params = ["bash", "-c", "\""+process_command+"\""]
 			self.process = subprocess.Popen(" ".join(process_params), stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=sublime.active_window().folders()[0])
+
+			if self.is_debug():
+					self.log_message("Started process command: " + " ".join(process_params) )
 		else:
 			# On Windows not using shell, so the proces is not visible to the user
 			process_params = ["ruby", "-C"+current_directory, "-r"+PathHelper.get_sublime_require(), file_name]
 			process_params += args
 			self.process = subprocess.Popen(process_params, stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=False)
+
+			if self.is_debug():
+				self.log_message("Started process command: " + " ".join(process_params) )
 
 	def connect_debugger(self):
 		self.data = StringIO()
@@ -118,7 +129,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 				self.log_message("Connected"+'\n')
 				break
 			except Exception as ex:
-				if i == 8:
+				if i == 9:
 					self.log_message("Connection could not be made: "+str(ex)+'\n')
 					return False
 				else:
@@ -256,7 +267,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def split_by_results(self):
 		result = [""]
 		for line in self.get_lines():
-			if self.debugger.match_ending(self.ruby_version[0], line):
+			if self.debugger.match_ending(self.ruby_version, line):
 				result.insert(len(result), "")
 			else:
 				result[len(result)-1] += line + '\n'
@@ -266,7 +277,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def has_end_stream(self):
 		end_of_stream = False
 		for line in self.get_lines():
-				if self.debugger.match_ending(self.ruby_version[0], line):
+				if self.debugger.match_ending(self.ruby_version, line):
 					end_of_stream = True;
 
 		return end_of_stream
@@ -277,12 +288,12 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = self.debugger.match_line_cursor(self.ruby_version[0], line)
+			match = self.debugger.match_line_cursor(self.ruby_version, line)
 
 			if match:
 				current_line = match.groups()[0]
 
-			match = self.debugger.match_file_cursor(self.ruby_version[0], line)
+			match = self.debugger.match_file_cursor(self.ruby_version, line)
 			if match:
 				current_file = match.groups()[0]
 
@@ -299,3 +310,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 		self.connected = False
 		self.process = None
+
+	def is_debug(self):
+		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
+		return settings.get('debug_logs')

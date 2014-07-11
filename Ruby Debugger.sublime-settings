@@ -1,0 +1,19 @@
+{
+  // Should show debug logs
+  "debug_logs": false,
+
+  // Custom args for ruby process when debugging file
+  "ruby_arguments": "",
+  
+  // Whether should use 'bundle exec' command when debugging file
+  // onlu for non rails debugging
+  "should_use_bundle": true,
+
+  // Pointing ruby's Binaries, it can be one of the following:
+  // "rvm", "rbenv", "[path-to-ruby-executable]"
+  "ruby_binaries": "rvm", 
+
+  // Which ruby version are supported, by default listed here are the versions
+  // we already have checked.
+  "supported_ruby_versions": ["2.1.0", "2.0.0", "1.9.3"]
+}

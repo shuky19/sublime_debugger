@@ -56,3 +56,7 @@ class PathHelper(object):
 	@staticmethod
 	def get_ruby_version_discoverer():
 		return os.path.join(sublime.packages_path(), "Ruby Debugger", "ruby_version_discoverer.rb")
+
+	@staticmethod
+	def get_ruby_executor():
+		return os.path.join(sublime.packages_path(), "Ruby Debugger", "ruby_executor.sh")
