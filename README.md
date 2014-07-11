@@ -100,6 +100,18 @@ to a folder named "Ruby Debugger".
 
 ## Troubleshoot
 
+#### Why do I get ```Connection could not be made: [Errno 61] Connection refused``` in the output window?
+
+Well, Most of the reasons for this error come from environmental problems, following the steps below will help you fix it:
+
+* Enable logging: preferences -> Package Settings -> Ruby Debugger -> Settings - Default (you can use User as well)
+* Run you ruby on a shell and make sure it runs perfectly.
+* From that shell run ```which ruby``` and ```ruby --version```
+* Run the debugger and compare its output to yours
+* Figure out whether your ruby path comes from a different ruby environment (rbenv | rvm | custom executable)
+* Figure out whether your ruby default version is not set appropriately
+
+
 #### Why do I get ```Errno::EADDRINUSE: Address already in use - bind(2)``` in the output window?
 Either because there is another process running which is using ports 8989/8990 or the last debugger process is still alive (```killall ruby``` will solve that).
 
