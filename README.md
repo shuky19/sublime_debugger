@@ -18,7 +18,9 @@ By [Shuky chen](https://github.com/shuky19), based on the [Debugger](https://git
 
 
 ## First steps
-In order to start debugging ruby or RoR applications all you need to do is [install](#installation) the Debugger plugin and press <kbd>F6</kbd>,or <kbd>Shift+F6</kbd>,or <kbd>Alt+Shift+F6</kbd>
+In order to start debugging ruby or RoR applications all you need to do is to
+[install](#installation) Debugger plugin and press on <kbd>F6</kbd> or
+<kbd>Shift+F6</kbd> or <kbd>Alt+Shift+F6</kbd>
 
 ## Features
 * Local debugging in Ruby and RoR applications.
@@ -91,8 +93,7 @@ Clone the repository by executing the following command in your Packages directo
 ```git clone https://github.com/shuky19/sublime_debugger.git "Ruby Debugger"```
 
 #### Download
-Get the latest [source from GitHub](https://github.com/shuky19/sublime_debugger/archive/master.zip) and extract the source into your Packages directory
-to a folder named "Ruby Debugger".
+Get the latest [source from GitHub](https://github.com/shuky19/sublime_debugger/archive/master.zip) and extract the source into your Packages directory to a folder named "Ruby Debugger".
 
 
 *__Note:__ You can locate your Packages directory in the menu under* `Preferences / Browse Packages...`
