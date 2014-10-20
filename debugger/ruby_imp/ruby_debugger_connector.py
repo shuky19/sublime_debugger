@@ -29,6 +29,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.control_client = None
 		self.connected = False
 		self.ruby_version = None
+		self.ruby_protocol_type = None
 		self.use_bundler = use_bundler
 		self.errors_reader = None
 		self.outputer = None
@@ -56,12 +57,20 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.reader = self.start_tread(self.reader_thread)
 
 	def validation_environment(self):
+		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
+
 		try:
 			if os.name == "posix":
+				# Fixing permissions
+				subprocess.Popen("bash -c \"chmod +x '" + PathHelper.get_ruby_executor() + "'\"", stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True).communicate()[0]
+
 				# On Unix using rvm and bash
-				rvm_load = "[[ -s \"$HOME/.rvm/scripts/rvm\" ]] 2> /dev/null ; source \"$HOME/.rvm/scripts/rvm\" 2> /dev/null"
-				validate_command = rvm_load + " ; exec ruby '" + PathHelper.get_ruby_version_discoverer()+"'"
-				self.ruby_version = subprocess.Popen(["bash", "-c", validate_command], stdout=subprocess.PIPE).communicate()[0]
+				ruby_binaries = "'"+settings.get("ruby_binaries")+"'"
+
+				# On Unix using exec and shell to get environemnt variables of ruby version
+				process_command = "'"+PathHelper.get_ruby_executor()+"' " + ruby_binaries + " False '" + PathHelper.get_ruby_version_discoverer() + "'"
+				process_params = ["bash", "-c", "\""+process_command+"\""]
+				self.ruby_version = subprocess.Popen(" ".join(process_params), stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True).communicate()[0]
 			else:
 				# On Windows not using shell, so the proces is not visible to the user
 				startupinfo = subprocess.STARTUPINFO()
@@ -73,11 +82,15 @@ class RubyDebuggerConnector(DebuggerConnector):
 			return False
 
 		self.ruby_version = self.ruby_version.decode("UTF-8").replace("\n", "").replace("\r", "")
-		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
 
 		if self.ruby_version not in settings.get('supported_ruby_versions'):
 			self.log_message("Ruby version: "+self.ruby_version+" is not supported.")
 			return False
+
+		if self.ruby_version == "1.9.3":
+			self.ruby_protocol_type = "debugger"
+		else:
+			self.ruby_protocol_type = "byebug"
 
 		return True
 
@@ -96,7 +109,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 		if os.name == "posix":
 			ruby_binaries = "'"+settings.get("ruby_binaries")+"'"
 			debug_logs_enabled = str(settings.get("debug_logs"))
-			ruby_arguments = directory + requires+" "+settings.get("ruby_arguments")+" "+program
+			ruby_arguments = directory + requires + " " + settings.get("ruby_arguments")+ " " +program
 
 			# On Unix using exec and shell to get environemnt variables of ruby version
 			process_command = "'"+PathHelper.get_ruby_executor()+"' " + ruby_binaries + " " + debug_logs_enabled + " " + ruby_arguments
@@ -271,7 +284,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def split_by_results(self):
 		result = [""]
 		for line in self.get_lines():
-			if self.debugger.match_ending(self.ruby_version, line):
+			if self.debugger.match_ending(self.ruby_protocol_type, line):
 				result.insert(len(result), "")
 			else:
 				result[len(result)-1] += line + '\n'
@@ -281,8 +294,8 @@ class RubyDebuggerConnector(DebuggerConnector):
 	def has_end_stream(self):
 		end_of_stream = False
 		for line in self.get_lines():
-				if self.debugger.match_ending(self.ruby_version, line):
-					end_of_stream = True;
+			if self.debugger.match_ending(self.ruby_protocol_type, line):
+				end_of_stream = True;
 
 		return end_of_stream
 
@@ -292,12 +305,12 @@ class RubyDebuggerConnector(DebuggerConnector):
 		end_of_stream = False
 
 		for line in self.get_lines():
-			match = self.debugger.match_line_cursor(self.ruby_version, line)
+			match = self.debugger.match_line_cursor(self.ruby_protocol_type, line)
 
 			if match:
 				current_line = match.groups()[0]
 
-			match = self.debugger.match_file_cursor(self.ruby_version, line)
+			match = self.debugger.match_file_cursor(self.ruby_protocol_type, line)
 			if match:
 				current_file = match.groups()[0]
 

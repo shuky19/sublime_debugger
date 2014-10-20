@@ -6,17 +6,17 @@ from .ruby_debug_command import RubyDebugCommand
 from .ruby_custom_debug_command import RubyCustomDebugCommand
 
 class RubyDebugger(Debugger):
-	PROTOCOL = {"1.9.3": {"end_regex":r"PROMPT \(rdb:\d+\) ",
+	PROTOCOL = {"debugger": {"end_regex":r"PROMPT \(rdb:\d+\) ",
 							 "line_regex":r"^=>\s+?(\d+)  .*$",
 							 "file_regex":r"\[-*\d+, \d+\] in (.*)$"},
-					"2.0.0": {"end_regex":r"PROMPT \(byebug\) ",
-							  "line_regex":r"^=>\s+?(\d+): .*$",
-							  "file_regex":r"\[-*\d+, \d+\] in (.*)$"}}
+				"byebug": {"end_regex":r"PROMPT \(byebug\) ",
+						  "line_regex":r"^=>\s+?(\d+): .*$",
+						  "file_regex":r"\[-*\d+, \d+\] in (.*)$"}}
 
 	# Define protocol
 	COMMANDS = { DebuggerModel.COMMAND_GET_LOCATION:RubyDebugCommand("l=", "GetLocation"),
 				 DebuggerModel.COMMAND_GET_STACKTRACE:RubyDebugCommand("where", DebuggerModel.DATA_STACK, True),
-				 DebuggerModel.COMMAND_GET_LOCALS:RubyDebugCommand("info local", DebuggerModel.DATA_LOCALS, True),
+				 DebuggerModel.COMMAND_GET_LOCALS:RubyDebugCommand("info args", DebuggerModel.DATA_LOCALS, True),
 				 DebuggerModel.COMMAND_GET_THREADS:RubyDebugCommand("thread l", DebuggerModel.DATA_THREADS, True),
 				 DebuggerModel.COMMAND_GET_EXPRESSION:RubyDebugCommand("eval", DebuggerModel.DATA_IMMEDIATE, True),
 				 DebuggerModel.COMMAND_GET_BREAKPOINTS:RubyDebugCommand("info break", DebuggerModel.DATA_BREAKPOINTS, True),
