@@ -62,7 +62,11 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.window.show_input_panel("Enter watch expression", '', lambda exp: self.on_watch_entered(exp), None, None)
 		# Start command
 		elif command == DebuggerModel.COMMAND_START_RAILS:
-			if PathHelper.file_exists("script/rails", self.window):
+			settings = sublime.load_settings('Ruby Debugger.sublime-settings')
+
+			if PathHelper.file_exists(settings.get("rails_executable_path"), self.window):
+				self.start_command(settings.get("rails_executable_path") + " s", True)
+			elif PathHelper.file_exists("script/rails", self.window):
 				self.start_command("script/rails s", True)
 			elif PathHelper.file_exists("bin/rails", self.window): # Rails 4 support
 				self.start_command("bin/rails s", True)

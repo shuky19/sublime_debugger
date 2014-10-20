@@ -102,7 +102,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 		# Case of running rails
 		if self.use_bundler or settings.get('should_use_bundle'):
-				requires = " '-rbundler/setup'" + requires
+				requires = requires + " '-rbundler/setup'"
 				directory = " '-C"+sublime.active_window().folders()[0]+"'"
 
 		# Initialize params acourding to OS type

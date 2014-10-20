@@ -17,7 +17,7 @@ if current_version = RUBY_VERSION > "1.9.3" ? r200 : r193
   begin
     require current_version.gem_name
 
-    if current_version.gem_version and  not Gem::Specification.find_all_by_name(current_version.gem_name, Gem::Requirement.create(current_version.gem_version)).any?
+    if current_version.gem_version and not Gem::Specification.find_all_by_name(current_version.gem_name, Gem::Requirement.create(current_version.gem_version)).any?
       puts "#{current_version.gem_name} version is not supported,"
       puts "please run: gem install byebug --version'#{current_version.gem_version}'"
       exit
