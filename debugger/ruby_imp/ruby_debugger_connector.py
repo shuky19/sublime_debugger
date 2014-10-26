@@ -21,7 +21,7 @@ from ..helpers import *
 
 class RubyDebuggerConnector(DebuggerConnector):
 	"""Connector used to communication with debugged process"""
-	def __init__(self, debugger, use_bundler):
+	def __init__(self, debugger):
 		super(RubyDebuggerConnector, self).__init__(debugger)
 		self.debugger = debugger
 		self.process = None
@@ -30,10 +30,16 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.connected = False
 		self.ruby_version = None
 		self.ruby_protocol_type = None
-		self.use_bundler = use_bundler
 		self.errors_reader = None
 		self.outputer = None
 		self.reader = None
+
+	def set_settings(self, use_bundler, ruby_binaries, ruby_supported_versions, ruby_arguments, debug_logs):
+		self.settings_use_bundler = use_bundler
+		self.settings_ruby_binaries = ruby_binaries
+		self.settings_ruby_supported_versions = ruby_supported_versions
+		self.settings_ruby_arguments = ruby_arguments
+		self.settings_debug_logs = debug_logs
 
 	def start(self, current_directory, file_name, *args):
 		'''
@@ -57,15 +63,13 @@ class RubyDebuggerConnector(DebuggerConnector):
 		self.reader = self.start_tread(self.reader_thread)
 
 	def validation_environment(self):
-		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
-
 		try:
 			if os.name == "posix":
 				# Fixing permissions
 				subprocess.Popen("bash -c \"chmod +x '" + PathHelper.get_ruby_executor() + "'\"", stdin = subprocess.PIPE, stderr = subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1, shell=True).communicate()[0]
 
 				# On Unix using rvm and bash
-				ruby_binaries = "'"+settings.get("ruby_binaries")+"'"
+				ruby_binaries = "'" + self.settings_ruby_binaries+"'"
 
 				# On Unix using exec and shell to get environemnt variables of ruby version
 				process_command = "'"+PathHelper.get_ruby_executor()+"' " + ruby_binaries + " False '" + PathHelper.get_ruby_version_discoverer() + "'"
@@ -83,7 +87,7 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 		self.ruby_version = self.ruby_version.decode("UTF-8").replace("\n", "").replace("\r", "")
 
-		if self.ruby_version not in settings.get('supported_ruby_versions'):
+		if self.ruby_version not in self.settings_ruby_supported_versions:
 			self.log_message("Ruby version: "+self.ruby_version+" is not supported.")
 			return False
 
@@ -101,15 +105,15 @@ class RubyDebuggerConnector(DebuggerConnector):
 		program = " '"+file_name+"' "+" ".join(args)
 
 		# Case of running rails
-		if self.use_bundler or settings.get('should_use_bundle'):
+		if self.settings_use_bundler:
 				requires = requires + " '-rbundler/setup'"
 				directory = " '-C"+sublime.active_window().folders()[0]+"'"
 
 		# Initialize params acourding to OS type
 		if os.name == "posix":
-			ruby_binaries = "'"+settings.get("ruby_binaries")+"'"
-			debug_logs_enabled = str(settings.get("debug_logs"))
-			ruby_arguments = directory + requires + " " + settings.get("ruby_arguments")+ " " +program
+			ruby_binaries = "'"+self.settings_ruby_binaries+"'"
+			debug_logs_enabled = str(self.settings_debug_logs)
+			ruby_arguments = directory + requires + " " + self.settings_ruby_arguments+ " " +program
 
 			# On Unix using exec and shell to get environemnt variables of ruby version
 			process_command = "'"+PathHelper.get_ruby_executor()+"' " + ruby_binaries + " " + debug_logs_enabled + " " + ruby_arguments
@@ -330,4 +334,4 @@ class RubyDebuggerConnector(DebuggerConnector):
 
 	def is_debug(self):
 		settings = sublime.load_settings('Ruby Debugger.sublime-settings')
-		return settings.get('debug_logs')
+		return self.settings_debug_logs

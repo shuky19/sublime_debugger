@@ -89,6 +89,14 @@ class DebugCommand(sublime_plugin.WindowCommand):
 		if is_legal:
 			# Intialize debugger layout
 			self.show_debugger_layout()
+
+			settings = sublime.load_settings('Ruby Debugger.sublime-settings')
+			self.settings_use_bundler = settings.get('use_bundler')
+			self.settings_ruby_binaries = settings.get('ruby_binaries')
+			self.settings_ruby_supported_versions = settings.get('supported_ruby_versions')
+			self.settings_ruby_arguments = settings.get('ruby_arguments')
+			self.settings_debug_logs = settings.get('debug_logs')
+
 			SublimeHelper.set_timeout_async(lambda file_path=file_path,bundle=use_bundler, args=arguments: self.start_command_async(file_path, bundle, *args), 0)
 		else:
 			sublime.message_dialog("File: " + file_path+" does not exists")
@@ -98,7 +106,8 @@ class DebugCommand(sublime_plugin.WindowCommand):
 			self.debugger.run_command(DebuggerModel.COMMAND_STOP)
 
 		# Initialize variables
-		self.debugger = RubyDebugger(self, use_bundler)
+		self.debugger = RubyDebugger(self)
+		self.debugger.set_settings(use_bundler or self.settings_use_bundler, self.settings_ruby_binaries, self.settings_ruby_supported_versions, self.settings_ruby_arguments, self.settings_debug_logs)
 		self.debugger_model = DebuggerModel(self.debugger)
 
 		# Start debugging
