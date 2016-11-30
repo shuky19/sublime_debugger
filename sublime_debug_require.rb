@@ -10,6 +10,8 @@ class RubyVersion
   end
 end
 
+require 'byebug/core'
+
 r193 = RubyVersion.new("1.9.3", "debugger", lambda { debugger  }, lambda {  Debugger.wait_connection = true; Debugger.start_remote "127.0.0.1" })
 r200 = RubyVersion.new("2.0.0", "byebug", lambda { byebug  }, lambda {  Byebug.wait_connection = true; Byebug.start_server "127.0.0.1" }, ">=2.5.0")
 
